@@ -1,8 +1,16 @@
+using Application.Interfaces.Services;
+using Application.Services;
+using Infrastructure;
+using Infrastructure.Interfaces;
+using Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
+builder.Services.AddDbContext<StatusMonitorDbContext>();
+builder.Services.AddScoped<ISensorRepository, SensorRepository>();
+builder.Services.AddScoped<ISensorService, SensorService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
