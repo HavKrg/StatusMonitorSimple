@@ -32,6 +32,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<StatusMonitorDbContext>();
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
 builder.Services.AddScoped<ISensorService, SensorService>();
+builder.Services.AddHostedService<MqttBridge>();
+builder.Services.AddSingleton(projectSettings);
 
 var app = builder.Build();
 

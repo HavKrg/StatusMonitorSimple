@@ -10,6 +10,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="mqttnet" Version="4.3.0.858" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.0.858" />
   </ItemGroup>
 
   <PropertyGroup>
