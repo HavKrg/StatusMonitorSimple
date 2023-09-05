@@ -9,6 +9,10 @@ public class StatusMonitorDbContext : DbContext
     {
     }
 
+    public StatusMonitorDbContext()
+    {
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data source = SensorMonitor.db");

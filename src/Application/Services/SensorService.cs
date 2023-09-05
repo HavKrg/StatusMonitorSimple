@@ -13,9 +13,10 @@ public class SensorService : ISensorService
         _sensorRespository = sensorRespository;
     }
 
-    public async Task<Sensor> CreateSensorAsync(Sensor sensor)
+    public async Task<Sensor> CreateSensorAsync(CreateSensor createSensor)
     {
-        return await _sensorRespository.CreateSensorAsync(sensor);
+        
+        return await _sensorRespository.CreateSensorAsync((Sensor)createSensor);
     }
 
     public async Task<IEnumerable<Sensor>> GetAllSensorsAsync()

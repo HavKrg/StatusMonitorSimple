@@ -1,8 +1,9 @@
 namespace Domain.Models;
 public class Sensor : BaseEntity
 {
-    public Sensor(string name, string description, string mqttTopic, double minReading, double maxReading, string measurement)
+    public Sensor(Guid id, string name, string description, string mqttTopic, double minReading, double maxReading, string measurement)
     {
+        Id = id;
         Name = name;
         Description = description;
         MqttTopic = mqttTopic;

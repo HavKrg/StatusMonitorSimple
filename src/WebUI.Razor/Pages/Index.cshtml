@@ -8,3 +8,14 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+@foreach(var sensor in Model.Sensors)
+{
+    <p>
+    <h1>@sensor.Name</h1>
+    <h2>@sensor.Description</h2>
+    <h2>@sensor.MinReading</h2>
+    <h2>@sensor.MaxReading</h2>
+    <h2>@sensor.MqttTopic</h2>
+    </p>
+}

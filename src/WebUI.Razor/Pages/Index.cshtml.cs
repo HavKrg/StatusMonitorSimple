@@ -1,4 +1,5 @@
 using Application.Interfaces.Services;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,6 +9,7 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private readonly ISensorService _sensorService;
+    public IEnumerable<Sensor> Sensors { get; set; }
 
     public IndexModel(ILogger<IndexModel> logger, ISensorService sensorService)
     {
@@ -15,15 +17,10 @@ public class IndexModel : PageModel
         _sensorService = sensorService;
     }
 
+
+    
     public async void OnGet()
     {
-        var sensors = await _sensorService.GetAllSensorsAsync();
-
-        foreach (var sensor in sensors)
-        {
-            _logger.LogInformation($"{sensor.Id} - {sensor.Name}");
-        }
-
-
+        Sensors = await _sensorService.GetAllSensorsAsync();
     }
 }
