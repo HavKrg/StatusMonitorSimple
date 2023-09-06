@@ -4,9 +4,9 @@ namespace Application.Interfaces.Services;
 
 public interface ISensorService
 {
-    Task<Sensor> CreateSensorAsync(CreateSensor createSensor);
-    Task<Sensor> GetSensorByIdAsync(Guid sensorId);
-    Task<IEnumerable<Sensor>> GetAllSensorsAsync();
-    Task UpdateSensorAsync(Sensor sensor);
+    Task<SensorResponse> CreateSensorAsync(CreateSensor createSensor);
+    Task<SensorResponse> GetSensorByIdAsync(Guid sensorId);
+    Task<IEnumerable<SensorResponse>> GetAllSensorsAsync();
+    Task UpdateSensorAsync(CreateSensor updateSensor);
     Task DeleteSensorAsync(Guid sensorId);
 }

@@ -17,5 +17,15 @@
     <h2>@sensor.MinReading</h2>
     <h2>@sensor.MaxReading</h2>
     <h2>@sensor.MqttTopic</h2>
+    @if(sensor.LatestReading != null)
+    {
+        <h1>@sensor.LatestReading.Created - @sensor.LatestReading.Value</h1>
+    }
+    else
+    {
+        <h1>No readings yet</h1>
+    }
+
+
     </p>
 }

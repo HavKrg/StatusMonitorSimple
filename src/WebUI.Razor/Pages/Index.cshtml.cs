@@ -1,3 +1,4 @@
+using Application;
 using Application.Interfaces.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private readonly ISensorService _sensorService;
-    public IEnumerable<Sensor> Sensors { get; set; }
+    public IEnumerable<SensorResponse> Sensors { get; set; }
 
     public IndexModel(ILogger<IndexModel> logger, ISensorService sensorService)
     {

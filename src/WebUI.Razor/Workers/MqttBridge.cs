@@ -1,4 +1,5 @@
 ﻿
+using Application;
 using Application.Interfaces.Services;
 using Domain.Models;
 using MQTTnet;
@@ -12,7 +13,7 @@ public class MqttBridge : BackgroundService
     private readonly ILogger<MqttBridge> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ProjectSettings _projectSettings;
-    public IEnumerable<Sensor> Sensors { get; set; }
+    public IEnumerable<SensorResponse> Sensors { get; set; } = new List<SensorResponse>();
 
     public MqttBridge(ILogger<MqttBridge> logger, ProjectSettings projectSettings, IServiceScopeFactory serviceScopeFactory)
     {
@@ -27,7 +28,7 @@ public class MqttBridge : BackgroundService
         using (var scope = _serviceScopeFactory.CreateScope())
         {
             var sensorService = scope.ServiceProvider.GetRequiredService<ISensorService>();
-            Sensors = await sensorService.GetAllSensorsAsync();
+            Sensors  = await sensorService.GetAllSensorsAsync();
         }
 
         var mqttFactory = new MqttFactory();
@@ -44,13 +45,11 @@ public class MqttBridge : BackgroundService
 
         var mqttSubscribeOptionsBuilder = mqttFactory.CreateSubscribeOptionsBuilder();
 
-    
-
 
         foreach (var sensor in Sensors)
         {
-                mqttSubscribeOptionsBuilder.WithTopicFilter(f => f.WithTopic(sensor.MqttTopic));
-                _logger.LogInformation($"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToShortTimeString()} : Subscribing to {_projectSettings.MqttBroker}/{sensor.MqttTopic}\n");
+            mqttSubscribeOptionsBuilder.WithTopicFilter(f => f.WithTopic(sensor.MqttTopic));
+            _logger.LogInformation($"{FormattedDateTime} : Subscribing to {_projectSettings.MqttBroker}/{sensor.MqttTopic}\n");
         }
         var mqttSubscribeOptions = mqttSubscribeOptionsBuilder.Build();
 
@@ -63,11 +62,60 @@ public class MqttBridge : BackgroundService
 
     private async Task HandleMessages(MqttApplicationMessageReceivedEventArgs e)
     {
-            _logger.LogInformation($"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToShortTimeString()} : Received mqtt-message\n      ClientID: {e.ClientId}\n      Topic: {e.ApplicationMessage.Topic}\n      Message: {e.ApplicationMessage.ConvertPayloadToString()}\n");
+        var clientId = e.ClientId;
+        var topic = e.ApplicationMessage.Topic;
+        var message = e.ApplicationMessage.ConvertPayloadToString();
+
+        _logger.LogInformation($"{FormattedDateTime} : Received mqtt-message\n      ClientID: {clientId}\n      Topic: {topic}\n      Message: {message}\n");
+
+        var validationResult = ValidateMessage(topic, message);
+
+        if (validationResult != null)
+        {
+            var (sensor, value) = validationResult.Value;
+            
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var sensorReadingService = scope.ServiceProvider.GetRequiredService<ISensorReadingService>();
+                if (!await sensorReadingService.AddReadingAsync(new CreateSensorReading { SensorId = sensor!.Id, Value = value }))
+                {
+                    _logger.LogError($"{FormattedDateTime} : Unable to add sensor reading to database");
+                    return;
+                }
+                else
+                    _logger.LogInformation($"{FormattedDateTime} : Successfully added reading for {sensor.Name} ({sensor.Id}) : {value} {sensor.Measurement}");
+            }
+        }
     }
+
+
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         throw new NotImplementedException();
     }
+
+    private (SensorResponse? sensor, double value)? ValidateMessage(string topic, string message)
+    {
+        var sensor = Sensors.FirstOrDefault(s => s.MqttTopic == topic);
+
+        if (sensor == null)
+        {
+            _logger.LogWarning($"{FormattedDateTime} : No sensor with MQTT-topic {topic}");
+            return null;
+        }
+        if (!double.TryParse(message, out double value))
+        {
+            _logger.LogWarning($"{FormattedDateTime} : Message is not parsable to a double");
+            return null;
+        }
+        if (value > sensor.MaxReading || value < sensor.MinReading)
+        {
+            _logger.LogWarning($"{FormattedDateTime} : Message is parsable to a double, but it's not within the sensors min/max value range");
+            return null;
+        }
+        return (sensor, value);
+    }
+
+    private static string FormattedDateTime => $"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToShortTimeString()}";
 }

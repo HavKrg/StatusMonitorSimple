@@ -13,27 +13,41 @@ using WebUI.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Parse configurartion files from argument
 if (args.Length == 0)
+{
     System.Console.WriteLine("missing argument for config file");
+    Environment.Exit(1);
+}
+else
+    builder.Configuration.AddJsonFile(args[0]);
 
-builder.Configuration.AddJsonFile(args[0]);
-
+// Extract sensor-list from configuration
 var sensors = builder.Configuration.GetSection("Sensors").Get<List<CreateSensor>>();
+
 if (sensors == null)
     System.Console.WriteLine("no sensors in configuration");
 
+// Extract project-settings from configuration
 var projectSettings = builder.Configuration.GetSection("ProjectSettings").Get<ProjectSettings>();
 
 if (projectSettings == null)
-    System.Console.WriteLine("no project-serttings in configuration");
+{
+    System.Console.WriteLine("no project-settings in configuration");
+    Environment.Exit(1);
+}
+else
+    builder.Services.AddSingleton(projectSettings);        
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<StatusMonitorDbContext>();
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
+builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
+builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
 builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddHostedService<MqttBridge>();
-builder.Services.AddSingleton(projectSettings);
+
 
 var app = builder.Build();
 
