@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Application.Dtos;
+using Domain.Models;
 
 namespace Application.Interfaces.Services;
 

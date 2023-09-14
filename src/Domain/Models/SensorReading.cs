@@ -8,6 +8,10 @@ public class SensorReading : BaseEntity
         Value = value;
     }
 
+    public SensorReading()
+    {
+        
+    }
     public Guid SensorId { get; set; }
     public double Value { get; set; }
 }

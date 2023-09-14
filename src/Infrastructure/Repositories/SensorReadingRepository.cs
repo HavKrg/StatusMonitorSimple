@@ -1,7 +1,9 @@
 ﻿using Domain.Models;
+using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
-namespace Infrastructure;
+namespace Infrastructure.Repositories;
 
 public class SensorReadingRepository : ISensorReadingRepository
 {
@@ -17,10 +19,10 @@ public class SensorReadingRepository : ISensorReadingRepository
         bool sensorExists = await _context.Sensors.AnyAsync(s => s.Id == sensorReading.SensorId);
         if (!sensorExists)
             return false;
-        
+
         await _context.SensorReadings.AddAsync(sensorReading);
         var result = await _context.SaveChangesAsync();
-        
+
         return result > 0;
     }
 
@@ -33,4 +35,41 @@ public class SensorReadingRepository : ISensorReadingRepository
 
         return response;
     }
+
+    public async Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(Guid sensorId, int pageNumber)
+    {
+        var sensor = await _context.Sensors.FindAsync(sensorId);
+
+        if (sensor == null)
+            return null;
+
+        var readings = await _context.SensorReadings.Where(s => s.SensorId == sensorId).ToListAsync();
+
+        sensor.PageSize = 24;
+
+        var totalPages = (int)Math.Ceiling((double)readings.Count() / sensor.PageSize);
+
+        if (pageNumber > totalPages || pageNumber == 0)
+            pageNumber = totalPages;
+
+
+        var result = new PaginatedData<List<SensorReading>>(pageNumber, totalPages, sensor.PageSize);
+        
+
+        if(pageNumber == totalPages)
+        {
+            result.Data = readings
+                                .TakeLast(result.PageSize)
+                                .ToList();
+        }
+        else
+        {
+            result.Data = readings
+                                .Skip((pageNumber - 1) * result.PageSize)
+                                .Take(result.PageSize)
+                                .ToList();
+        }
+
+        return result;
+    }   
 }

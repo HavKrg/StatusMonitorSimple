@@ -1,6 +1,8 @@
 ﻿
+using Application.Dtos;
 using Domain.Models;
 using Infrastructure;
+using Infrastructure.Interfaces;
 
 namespace Application;
 
@@ -25,5 +27,22 @@ public class SensorReadingService : ISensorReadingService
             return null;
         return sensorReadingResponse;
         
+    }
+
+    public async Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(Guid sensorId, int pageNumber)
+    {
+        var readings = await _sensorReadingRepository.GetPaginatedSensorReadings(sensorId, pageNumber);
+
+        if(readings == null || !readings.Data.Any())
+            return null;
+        
+        return  new PaginatedDataResponse<List<SensorReadingResponse>>()
+        {
+            CurrentPage = readings.CurrentPage,
+            PageSize = readings.PageSize,
+            TotalPages = readings.TotalPages,
+            Data = readings.Data.Select(r => (SensorReadingResponse)r).ToList()
+        };
+
     }
 }

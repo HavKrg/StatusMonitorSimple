@@ -39,7 +39,7 @@ public class SensorRepository : ISensorRepository
     public async Task DeleteSensorAsync(Guid sensorId)
     {
         var sensor = await _context.Sensors.FindAsync(sensorId);
-        if(sensor == null)
+        if (sensor == null)
             return;
         _context.Sensors.Remove(sensor);
         await _context.SaveChangesAsync();

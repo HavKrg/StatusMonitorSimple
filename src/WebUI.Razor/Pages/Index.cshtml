@@ -1,31 +1,40 @@
 ﻿@page
 @model IndexModel
+
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = @Model.ProjectSettings.ProjectName;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="container">
+    <div class="row d-flex align-items-center justify-content-center">
+        @if (!@Model.Sensors.Any())
+        {
+            <p>
+                <em>no sensors</em>
+            </p>
+        }
+        else
+        {
+            @foreach (var sensor in @Model.Sensors)
+            {
+                    await Html.RenderPartialAsync("_SensorCard", sensor);
+            }
+        }
+    </div>
 </div>
 
-@foreach(var sensor in Model.Sensors)
-{
-    <p>
-    <h1>@sensor.Name</h1>
-    <h2>@sensor.Description</h2>
-    <h2>@sensor.MinReading</h2>
-    <h2>@sensor.MaxReading</h2>
-    <h2>@sensor.MqttTopic</h2>
-    @if(sensor.LatestReading != null)
-    {
-        <h1>@sensor.LatestReading.Created - @sensor.LatestReading.Value</h1>
-    }
-    else
-    {
-        <h1>No readings yet</h1>
+<style>
+    .vertical {
+        width: 100px; /* Width of the progress bar */
+        height: 100px; /* Height of the progress bar */
+        position: relative;
     }
 
-
-    </p>
-}
+    .vertical .progress-bar {
+        width: 100%; /* Full width */
+        height: 0; /* Start out from zero height */
+        position: absolute;
+        bottom: 0; /* Position at the bottom */
+    }
+</style>

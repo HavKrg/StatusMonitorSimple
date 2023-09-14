@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
 
-namespace Application;
+namespace Application.Dtos;
 
 public class SensorResponse
 {
@@ -12,6 +12,8 @@ public class SensorResponse
     public required double MaxReading { get; set; }
     public required string Measurement { get; set; }
     public SensorReadingResponse? LatestReading { get; set; }
+    public List<SensorReadingResponse> Readings { get; set; } = new List<SensorReadingResponse>();
+    public int TotalReadings => Readings.Count();
 
     public static implicit operator SensorResponse?(Sensor? sensor)
     {
@@ -27,5 +29,29 @@ public class SensorResponse
             MaxReading = sensor.MaxReading,
             Measurement = sensor.Measurement
         };
+    }
+
+    public int? GetLatestReadingPercent()
+    {
+        if(LatestReading == null)
+            return null;
+        return (int)((double)LatestReading.Value / MaxReading * 100);
+    }
+    
+    public bool LatestReadingIsOld()
+    {
+        if(LatestReading == null)
+            return true;
+        
+        TimeSpan timeSinceLastReading = DateTime.Now.Subtract(LatestReading.Created);
+        if(timeSinceLastReading.TotalHours >= 3)
+            return true;
+        return false;
+    }
+
+
+    public int GetTotalPages(int pageSize)
+    {
+        return (int)Math.Ceiling((double)TotalReadings / pageSize);
     }
 }

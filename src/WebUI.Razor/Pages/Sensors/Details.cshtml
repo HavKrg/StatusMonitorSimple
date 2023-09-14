@@ -1,0 +1,123 @@
+﻿@page
+@model DetailsModel
+<script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="sensor-info-container">
+    <h5 class="display-5 ">@Model.Sensor.Name</h5>
+</div>
+
+
+<form id="chartForm">
+<div class="chart-container">
+    <canvas id="sensorChart"></canvas>
+    <div>
+        <p>@Model.Readings.CurrentPage / @Model.Readings.TotalPages</p>
+    </div>
+    @if(Model.Readings.TotalPages > 0)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(Model.Readings.CurrentPage == 1 ? "disabled" : "")">
+                <!-- First Page -->
+                @if(Model.Readings.CurrentPage != 1)
+                {
+                    <a class="page-link" asp-page="/Sensors/Details" asp-route-sensorId="@Model.Sensor.Id" asp-route-pageNumber="1">First</a>
+                }
+                else
+                {
+                    <span class="page-link">First</span>
+                }
+            </li>
+
+            <li class="page-item @(Model.Readings.CurrentPage == 1 ? "disabled" : "")">
+                <!-- Previous Page -->
+                @if(Model.Readings.CurrentPage != 1)
+                {
+                    <a class="page-link" asp-page="/Sensors/Details" asp-route-sensorId="@Model.Sensor.Id" asp-route-pageNumber="@((Model.Readings.CurrentPage - 1) <= 0 ? 1 : (Model.Readings.CurrentPage - 1))">Previous</a>
+                }
+                else
+                {
+                    <span class="page-link">Previous</span>
+                }
+            </li>
+
+            <li class="page-item @(Model.Readings.CurrentPage == Model.Readings.TotalPages ? "disabled" : "")">
+                <!-- Next Page -->
+                @if(Model.Readings.CurrentPage != Model.Readings.TotalPages)
+                {
+                    <a class="page-link" asp-page="/Sensors/Details" asp-route-sensorId="@Model.Sensor.Id" asp-route-pageNumber="@((Model.Readings.CurrentPage + 1) >= Model.Readings.TotalPages ? Model.Readings.TotalPages : (Model.Readings.CurrentPage + 1))">Next</a>
+                }
+                else
+                {
+                    <span class="page-link">Next</span>
+                }
+            </li>
+
+            <li class="page-item @(Model.Readings.CurrentPage == Model.Readings.TotalPages ? "disabled" : "")">
+                <!-- Last Page -->
+                @if(Model.Readings.CurrentPage != Model.Readings.TotalPages)
+                {
+                    <a class="page-link" asp-page="/Sensors/Details" asp-route-sensorId="@Model.Sensor.Id" asp-route-pageNumber="@Model.Readings.TotalPages">Last</a>
+                }
+                else
+                {
+                    <span class="page-link">Last</span>
+                }
+            </li>
+        </ul>
+    </nav>
+}
+</div>
+</form>
+
+
+
+<script>
+    var sensorData = @Json.Serialize(Model.Readings.Data);
+    var minValue = @Model.Sensor.MinReading;
+    var maxValue = @Model.Sensor.MaxReading;
+
+    var ctx = document.getElementById('sensorChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sensorData.map(function (reading) {
+                var date = new Date(reading.created);
+                return `${date.getDate()}/${date.getMonth() + 1}  ${date.getHours()}:${date.getMinutes()}`;
+            }),
+            datasets: [{
+                label: @Json.Serialize(Model.Sensor.Description),
+                data: sensorData.map(function (reading) { return parseFloat(reading.value); }), // make sure this is a number
+                borderColor: 'rgba(0, 123, 255, 0.5)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    min: parseFloat(minValue),
+                    max: parseFloat(maxValue),
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .chart-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-top: 20px;
+        height: 60vh;
+    }
+    .sensor-info-container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 3rem;
+        }
+</style>

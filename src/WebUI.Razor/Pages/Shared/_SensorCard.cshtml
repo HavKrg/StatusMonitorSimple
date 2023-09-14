@@ -1,0 +1,43 @@
+@model Application.Dtos.SensorResponse
+
+<div class="card @(Model.LatestReadingIsOld() ? "alert alert-danger" : "alert alert-success")" style="width: 18rem; margin: 10px">
+    <a asp-page="./Sensors/Details" asp-route-sensorId="@Model.Id" class="card-link text-decoration-none">
+
+        <div class="card-body text-center">
+            <h3 class="card-title">@Model.Name</h3>
+
+            @if (Model.LatestReading != null)
+            {
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <div title="Min: @Model.MinReading, Max: @Model.MaxReading" class="progress vertical">
+                        <div class="progress-bar"
+                             role="progressbar"
+                             aria-valuenow="@Model.GetLatestReadingPercent()"
+                             aria-valuemin="@Model.MinReading"
+                             aria-valuemax="@Model.MaxReading"
+                             style="height: @Model.GetLatestReadingPercent()%">
+                        </div>
+                    </div>
+                </div>
+                <h5 class="card-title p-3">@Model.LatestReading.Value @Model.Measurement</h5>
+                <p class="card-text">@Model.LatestReading.Created</p>
+            }
+            else
+            {
+                <p>No readings yet</p>
+            }
+        </div>
+    </a>
+</div>
+
+<style>
+    a.card-link {
+        color: inherit;      /* Inherit the color from the parent element or make it whatever color you want */
+        text-decoration: none;
+    }
+
+    a.card-link:hover {
+        color: inherit;      /* Inherit the color from the parent on hover or make it whatever color you want */
+        text-decoration: none;
+    }
+</style>

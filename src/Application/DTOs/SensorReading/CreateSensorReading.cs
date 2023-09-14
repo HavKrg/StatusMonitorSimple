@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
 
-namespace Application;
+namespace Application.Dtos;
 
 public class CreateSensorReading
 {

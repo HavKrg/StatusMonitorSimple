@@ -18,6 +18,7 @@ public class Sensor : BaseEntity
     public double MinReading { get; set; }
     public double MaxReading { get; set; }
     public string Measurement { get; set; }
+    public int PageSize { get; set; }
     public IEnumerable<SensorReading> Readings { get; set; } = new List<SensorReading>();
 }
 

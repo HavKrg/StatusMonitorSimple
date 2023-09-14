@@ -1,5 +1,6 @@
 ﻿
 using Application;
+using Application.Dtos;
 using Application.Interfaces.Services;
 using Domain.Models;
 using MQTTnet;
@@ -37,6 +38,7 @@ public class MqttBridge : BackgroundService
 
         var mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(_projectSettings.MqttBroker)
+                .WithCredentials(_projectSettings.MqttUser, _projectSettings.MqttPassword)
                 .Build();
 
         var managedMqttClientOptions = new ManagedMqttClientOptionsBuilder()

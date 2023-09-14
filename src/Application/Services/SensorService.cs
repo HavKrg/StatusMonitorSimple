@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Dtos;
+using Application.Interfaces.Services;
 using Domain.Models;
 using Infrastructure;
 using Infrastructure.Interfaces;
@@ -47,4 +48,5 @@ public class SensorService : ISensorService
     {
         await _sensorRespository.DeleteSensorAsync(sensorId);
     }
+
 }
