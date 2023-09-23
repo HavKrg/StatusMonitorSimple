@@ -63,85 +63,64 @@
             </ul>
         </nav>
     }
-
-    <script>
-        var sensorData = @Json.Serialize(Model.Readings.Data);
-        var minValue = @Model.Sensor.MinReading;
-        var maxValue = @Model.Sensor.MaxReading;
-        var measurement = "@Model.Sensor.Measurement";
-        
-
-        var ctx = document.getElementById('sensorChart');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: sensorData.map(function (reading) {
-                    var date = new Date(reading.created);
-                    return `${date.getDate()}/${date.getMonth() + 1} ` +
-                            `${date.getHours().toString().padStart(2, '0')}:` +
-                            `${date.getMinutes().toString().padStart(2, '0')}:` +
-                            `${date.getSeconds().toString().padStart(2, '0')}`;
-
-
-                }),
-                datasets: [{
-                    label: @Json.Serialize(Model.Sensor.Description),
-                    data: sensorData.map(function (reading) { return parseFloat(reading.value); }), // make sure this is a number
-                    borderColor: 'rgba(0, 123, 255, 0.5)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        min: parseFloat(minValue),
-                        max: parseFloat(maxValue),
-                        ticks: {
-                            // Include a unit in the label
-                            callback: function (value, index, values) {
-                                return value + " " + measurement; // Replace 'unit' with your actual unit
-                            }
-                        }
-                    }
-                },
-            }
-        });
-    </script>
-
-    @* <script>
-        var sensorData = @Json.Serialize(Model.Readings.Data);
-        var minValue = @Model.Sensor.MinReading;
-        var maxValue = @Model.Sensor.MaxReading;
-
-        var ctx = document.getElementById('sensorChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: sensorData.map(function (reading) {
-                    var date = new Date(reading.created);
-                    return `${date.getDate()}/${date.getMonth() + 1}  ${date.getHours()}:${date.getMinutes()}`;
-                }),
-                datasets: [{
-                    label: @Json.Serialize(Model.Sensor.Description),
-                    data: sensorData.map(function (reading) { return parseFloat(reading.value); }), // make sure this is a number
-                    borderColor: 'rgba(0, 123, 255, 0.5)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        min: parseFloat(minValue),
-                        max: parseFloat(maxValue),
-                        ticks: {
-                            // Include a unit in the label
-                            callback: function (value, index, values) {
-                                return value + ' cm'; // Replace 'unit' with your actual unit
-                            }
-                        }
-                    }
-                },
-            }
-        });
-    </script> *@
 </div>
+
+<script>
+    var sensorData = @Json.Serialize(Model.Readings.Data);
+    var minValue = @Model.Sensor.MinReading;
+    var maxValue = @Model.Sensor.MaxReading;
+    var measurement = "@Model.Sensor.Measurement";
+
+
+    var ctx = document.getElementById('sensorChart');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sensorData.map(function (reading) {
+                var date = new Date(reading.created);
+                return `${date.getDate()}/${date.getMonth() + 1} ` +
+                    `${date.getHours().toString().padStart(2, '0')}:` +
+                    `${date.getMinutes().toString().padStart(2, '0')}:` +
+                    `${date.getSeconds().toString().padStart(2, '0')}`;
+
+
+            }),
+            datasets: [{
+                label: @Json.Serialize(Model.Sensor.Description),
+                data: sensorData.map(function (reading) { return parseFloat(reading.value); }), // make sure this is a number
+                borderColor: 'rgba(0, 123, 255, 0.5)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    min: parseFloat(minValue),
+                    max: parseFloat(maxValue),
+                    ticks: {
+                        // Include a unit in the label
+                        callback: function (value, index, values) {
+                            return value + " " + measurement; // Replace 'unit' with your actual unit
+                        }
+                    }
+                }
+            },
+
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+
+                            if (label) {
+                                label += ': ' + context.parsed.y + ' ' + measurement;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+
+    });
+</script>
