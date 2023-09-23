@@ -35,7 +35,7 @@ public class SensorService : ISensorService
         return response;
     }
 
-    public async Task<SensorResponse> GetSensorByIdAsync(Guid sensorId)
+    public async Task<SensorResponse> GetSensorByIdAsync(int sensorId)
     {
         return await _sensorRespository.GetSensorByIdAsync(sensorId);
     }
@@ -44,7 +44,7 @@ public class SensorService : ISensorService
     {
         await _sensorRespository.UpdateSensorAsync((Sensor)updateSensor);
     }
-    public async Task DeleteSensorAsync(Guid sensorId)
+    public async Task DeleteSensorAsync(int sensorId)
     {
         await _sensorRespository.DeleteSensorAsync(sensorId);
     }

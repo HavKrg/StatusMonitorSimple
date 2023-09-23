@@ -4,13 +4,15 @@ namespace Application.Dtos;
 
 public class SensorResponse
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
     public required double MinReading { get; set; }
     public required double MaxReading { get; set; }
     public required string Measurement { get; set; }
+    public required int PageSize { get; set; }
+    public required string Group { get; set; }
     public SensorReadingResponse? LatestReading { get; set; }
     public List<SensorReadingResponse> Readings { get; set; } = new List<SensorReadingResponse>();
     public int TotalReadings => Readings.Count();
@@ -27,7 +29,9 @@ public class SensorResponse
             MqttTopic = sensor.MqttTopic,
             MinReading = sensor.MinReading,
             MaxReading = sensor.MaxReading,
-            Measurement = sensor.Measurement
+            Measurement = sensor.Measurement,
+            PageSize = sensor.PageSize,
+            Group = sensor.Group
         };
     }
 

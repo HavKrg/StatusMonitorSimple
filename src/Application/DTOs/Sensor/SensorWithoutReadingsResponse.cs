@@ -1,16 +1,19 @@
-﻿using Domain.Models;
+﻿using System.Text.RegularExpressions;
+using Domain.Models;
 
 namespace Application;
 
 public class SensorWithoutReadingsResponse
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
     public required double MinReading { get; set; }
     public required double MaxReading { get; set; }
     public required string Measurement { get; set; }
+    public required int PageSize { get; set; }
+    public required string Group { get; set; }
 
     public static implicit operator SensorWithoutReadingsResponse?(Sensor? sensor)
     {
@@ -24,7 +27,9 @@ public class SensorWithoutReadingsResponse
             MqttTopic = sensor.MqttTopic,
             MinReading = sensor.MinReading,
             MaxReading = sensor.MaxReading,
-            Measurement = sensor.Measurement
+            Measurement = sensor.Measurement,
+            PageSize = sensor.PageSize,
+            Group = sensor.Group
         };
     }
 

@@ -6,7 +6,7 @@ public class SensorReadingResponse
 {
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
-    public required Guid SensorId { get; set; }
+    public required int SensorId { get; set; }
     public required double Value { get; set; }
 
     public static implicit operator SensorReadingResponse?(SensorReading? sensorReading)

@@ -4,7 +4,7 @@ namespace Application.Dtos;
 
 public class CreateSensorReading
 {
-    public required Guid SensorId { get; set; }
+    public required int SensorId { get; set; }
     public required double Value { get; set; }
 
     public static explicit operator SensorReading(CreateSensorReading createSensorReading)

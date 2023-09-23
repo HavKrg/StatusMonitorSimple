@@ -1,5 +1,4 @@
-using System.Data.Common;
-using System.Text.Json;
+using System.Net.WebSockets;
 using Application;
 using Application.Dtos;
 using Application.Interfaces.Services;
@@ -8,8 +7,8 @@ using Infrastructure;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.SeedData;
-using Microsoft.Extensions.Configuration;
 using WebUI.Razor;
+using WebUI.Razor.Workers.MqttBridge;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +37,8 @@ if (projectSettings == null)
     Environment.Exit(1);
 }
 else
-    builder.Services.AddSingleton(projectSettings);        
+    builder.Services.AddSingleton(projectSettings);
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -59,11 +59,15 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
+    System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
+    
     SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
 }
 if (app.Environment.IsDevelopment())
 {
-    SeedDataDev.Initialize();
+    System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
+    var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
+    SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
 }
 
 app.UseHttpsRedirection();

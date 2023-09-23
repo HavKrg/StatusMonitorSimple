@@ -5,7 +5,6 @@
     ViewData["Title"] = @Model.ProjectSettings.ProjectName;
 }
 
-
 <div class="container">
     <div class="row d-flex align-items-center justify-content-center">
         @if (!@Model.Sensors.Any())
@@ -16,9 +15,24 @@
         }
         else
         {
-            @foreach (var sensor in @Model.Sensors)
+            @foreach (var group in @Model.SensorGroups)
             {
-                    await Html.RenderPartialAsync("_SensorCard", sensor);
+                <div class="container">
+                    <div class="container">
+                        <h1 class="display-4 row d-flex align-items-center justify-content-center groupname">
+                            <a class="text-decoration-none text-reset  row d-flex align-items-center justify-content-center"
+                                asp-area="" asp-page="/Index">@group.First().Group</a>
+                        </h1>
+                    </div>
+                    <div class="container">
+                        <div class="row d-flex align-items-center justify-content-center">
+                            @foreach (var sensor in group)
+                            {
+                                await Html.RenderPartialAsync("_SensorCard", sensor);
+                            }
+                        </div>
+                    </div>
+                </div>
             }
         }
     </div>
@@ -26,15 +40,25 @@
 
 <style>
     .vertical {
-        width: 100px; /* Width of the progress bar */
-        height: 100px; /* Height of the progress bar */
+        width: 100px;
+        /* Width of the progress bar */
+        height: 100px;
+        /* Height of the progress bar */
         position: relative;
     }
 
     .vertical .progress-bar {
-        width: 100%; /* Full width */
-        height: 0; /* Start out from zero height */
+        width: 100%;
+        /* Full width */
+        height: 0;
+        /* Start out from zero height */
         position: absolute;
-        bottom: 0; /* Position at the bottom */
+        bottom: 0;
+        /* Position at the bottom */
+    }
+
+    .groupname {
+        margin-top: 50;
+        min-height: 75px;
     }
 </style>

@@ -6,7 +6,7 @@ namespace Application;
 public interface ISensorReadingService
 {
     Task<bool> AddReadingAsync(CreateSensorReading createSensorReading);
-    Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(Guid sensorId);
-    Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(Guid sensorId, int pageNumber);
+    Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(int sensorId);
+    Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(int sensorId, int pageNumber);
 }
 

@@ -1,5 +1,4 @@
-﻿
-using Application;
+﻿using Application;
 using Application.Dtos;
 using Application.Interfaces.Services;
 using Domain.Models;
@@ -7,7 +6,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 
-namespace WebUI.Razor;
+namespace WebUI.Razor.Workers.MqttBridge;
 
 public class MqttBridge : BackgroundService
 {
@@ -15,6 +14,7 @@ public class MqttBridge : BackgroundService
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ProjectSettings _projectSettings;
     public IEnumerable<SensorResponse> Sensors { get; set; } = new List<SensorResponse>();
+    private IManagedMqttClient _mqttClient { get; set; }
 
     public MqttBridge(ILogger<MqttBridge> logger, ProjectSettings projectSettings, IServiceScopeFactory serviceScopeFactory)
     {
@@ -29,38 +29,81 @@ public class MqttBridge : BackgroundService
         using (var scope = _serviceScopeFactory.CreateScope())
         {
             var sensorService = scope.ServiceProvider.GetRequiredService<ISensorService>();
-            Sensors  = await sensorService.GetAllSensorsAsync();
+            var sensors = await sensorService.GetAllSensorsAsync();
+            Sensors = sensors.OrderBy(s => s.Id);
         }
 
         var mqttFactory = new MqttFactory();
 
-        var mqttClient = mqttFactory.CreateManagedMqttClient();
+        _mqttClient = mqttFactory.CreateManagedMqttClient();
+
+        _mqttClient.ApplicationMessageReceivedAsync += HandleMessages;
+        _mqttClient.ConnectingFailedAsync += ConnectionFailed;
+        _mqttClient.ConnectionStateChangedAsync += ConnectionChanged;
+
+
+        var tlsOptions = new MqttClientTlsOptionsBuilder()
+            .UseTls()
+            .Build();
+
 
         var mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(_projectSettings.MqttBroker)
+                .WithTcpServer(_projectSettings.MqttBroker, _projectSettings.MqttPort)
+                .WithClientId(_projectSettings.MqttClientId)
                 .WithCredentials(_projectSettings.MqttUser, _projectSettings.MqttPassword)
+                .WithCleanSession()
+                .WithTlsOptions(tlsOptions)
+                .WithKeepAlivePeriod(TimeSpan.FromMinutes(600))
                 .Build();
 
         var managedMqttClientOptions = new ManagedMqttClientOptionsBuilder()
                 .WithClientOptions(mqttClientOptions)
                 .Build();
 
-        var mqttSubscribeOptionsBuilder = mqttFactory.CreateSubscribeOptionsBuilder();
-
-
-        foreach (var sensor in Sensors)
+        try
         {
-            mqttSubscribeOptionsBuilder.WithTopicFilter(f => f.WithTopic(sensor.MqttTopic));
-            _logger.LogInformation($"{FormattedDateTime} : Subscribing to {_projectSettings.MqttBroker}/{sensor.MqttTopic}\n");
+            foreach (var sensor in Sensors)
+            {
+                await _mqttClient.SubscribeAsync(sensor.MqttTopic);
+                _logger.LogInformation($"Subscribed to {sensor.MqttTopic}");
+            }
         }
-        var mqttSubscribeOptions = mqttSubscribeOptionsBuilder.Build();
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Something went wrong when subscribing. {ex.Message}");
+            throw;
+        }
 
-        await mqttClient.SubscribeAsync(mqttSubscribeOptions.TopicFilters);
-
-        mqttClient.ApplicationMessageReceivedAsync += HandleMessages;
-
-        await mqttClient.StartAsync(managedMqttClientOptions);
+        try
+        {
+            await _mqttClient.StartAsync(managedMqttClientOptions);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            throw;
+        }
     }
+
+    private async Task ConnectionChanged(EventArgs args)
+    {
+        if (_mqttClient.IsConnected)
+            _logger.LogInformation($"Connection status changed : connected");
+        else
+            _logger.LogInformation($"Connection status changed : disconnected");
+        
+        _logger.LogInformation($"{args.ToString()}");
+        await Task.CompletedTask;
+        
+    }
+
+    private async Task ConnectionFailed(ConnectingFailedEventArgs args)
+    {
+        _logger.LogCritical($"Failed to connect to broker\n {args.Exception.Message}\n {args.ConnectResult.UserProperties}\n{args.ConnectResult.ResultCode}");
+
+    }
+
+
 
     private async Task HandleMessages(MqttApplicationMessageReceivedEventArgs e)
     {
@@ -68,14 +111,13 @@ public class MqttBridge : BackgroundService
         var topic = e.ApplicationMessage.Topic;
         var message = e.ApplicationMessage.ConvertPayloadToString();
 
-        _logger.LogInformation($"{FormattedDateTime} : Received mqtt-message\n      ClientID: {clientId}\n      Topic: {topic}\n      Message: {message}\n");
 
-        var validationResult = ValidateMessage(topic, message);
+        var validationResult = ValidateMessage(clientId, topic, message);
 
         if (validationResult != null)
         {
             var (sensor, value) = validationResult.Value;
-            
+
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var sensorReadingService = scope.ServiceProvider.GetRequiredService<ISensorReadingService>();
@@ -97,23 +139,26 @@ public class MqttBridge : BackgroundService
         throw new NotImplementedException();
     }
 
-    private (SensorResponse? sensor, double value)? ValidateMessage(string topic, string message)
+    private (SensorResponse? sensor, double value)? ValidateMessage(string clientId, string topic, string message)
     {
+        var logMessage = $"{FormattedDateTime} : Received mqtt-message\n      ClientID: {clientId}\n      Topic: {topic}\n      Message: {message}\n";
+        
+
         var sensor = Sensors.FirstOrDefault(s => s.MqttTopic == topic);
 
         if (sensor == null)
         {
-            _logger.LogWarning($"{FormattedDateTime} : No sensor with MQTT-topic {topic}");
+            _logger.LogWarning($"{logMessage}{FormattedDateTime} : No sensor with MQTT-topic {topic}");
             return null;
         }
         if (!double.TryParse(message, out double value))
         {
-            _logger.LogWarning($"{FormattedDateTime} : Message is not parsable to a double");
+            _logger.LogWarning($"{logMessage}{FormattedDateTime} : Message is not parsable to a double");
             return null;
         }
         if (value > sensor.MaxReading || value < sensor.MinReading)
         {
-            _logger.LogWarning($"{FormattedDateTime} : Message is parsable to a double, but it's not within the sensors min/max value range");
+            _logger.LogWarning($"{logMessage}{FormattedDateTime} : Message is parsable to a double, but it's not within the sensors min/max value range");
             return null;
         }
         return (sensor, value);

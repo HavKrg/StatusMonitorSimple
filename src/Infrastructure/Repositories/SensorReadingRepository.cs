@@ -26,7 +26,7 @@ public class SensorReadingRepository : ISensorReadingRepository
         return result > 0;
     }
 
-    public async Task<SensorReading?> GetLatestReadingForSensorAsync(Guid sensorId)
+    public async Task<SensorReading?> GetLatestReadingForSensorAsync(int sensorId)
     {
         var response = await _context.SensorReadings
                             .Where(s => s.SensorId == sensorId)
@@ -36,7 +36,7 @@ public class SensorReadingRepository : ISensorReadingRepository
         return response;
     }
 
-    public async Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(Guid sensorId, int pageNumber)
+    public async Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(int sensorId, int pageNumber)
     {
         var sensor = await _context.Sensors.FindAsync(sensorId);
 
@@ -44,8 +44,6 @@ public class SensorReadingRepository : ISensorReadingRepository
             return null;
 
         var readings = await _context.SensorReadings.Where(s => s.SensorId == sensorId).ToListAsync();
-
-        sensor.PageSize = 24;
 
         var totalPages = (int)Math.Ceiling((double)readings.Count() / sensor.PageSize);
 

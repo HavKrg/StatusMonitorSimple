@@ -4,13 +4,15 @@ namespace Application.Dtos;
 
 public class CreateSensor
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
     public required double MinReading { get; set; }
     public required double MaxReading { get; set; }
     public required string Measurement { get; set; }
+    public required string Group {get; set;} = "&nbsp;";
+    public required int PageSize { get; set; }
 
     public static explicit operator Sensor(CreateSensor createSensor)
     {
@@ -21,7 +23,9 @@ public class CreateSensor
             createSensor.MqttTopic, 
             createSensor.MinReading, 
             createSensor.MaxReading, 
-            createSensor.Measurement
+            createSensor.Measurement,
+            createSensor.PageSize,
+            createSensor.Group
             );
     }
 }

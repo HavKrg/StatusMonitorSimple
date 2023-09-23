@@ -25,7 +25,7 @@ public class SensorRepository : ISensorRepository
         return await _context.Sensors.ToListAsync();
     }
 
-    public async Task<Sensor?> GetSensorByIdAsync(Guid sensorId)
+    public async Task<Sensor?> GetSensorByIdAsync(int sensorId)
     {
         return await _context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
     }
@@ -36,7 +36,7 @@ public class SensorRepository : ISensorRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteSensorAsync(Guid sensorId)
+    public async Task DeleteSensorAsync(int sensorId)
     {
         var sensor = await _context.Sensors.FindAsync(sensorId);
         if (sensor == null)

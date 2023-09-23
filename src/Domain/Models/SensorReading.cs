@@ -2,7 +2,7 @@ namespace Domain.Models;
 
 public class SensorReading : BaseEntity
 {
-    public SensorReading(Guid sensorId, double value)
+    public SensorReading(int sensorId, double value)
     {
         SensorId = sensorId;
         Value = value;
@@ -12,6 +12,6 @@ public class SensorReading : BaseEntity
     {
         
     }
-    public Guid SensorId { get; set; }
+    public int SensorId { get; set; }
     public double Value { get; set; }
 }

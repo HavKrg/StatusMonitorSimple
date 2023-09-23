@@ -20,7 +20,7 @@ public class SensorReadingService : ISensorReadingService
         return await _sensorReadingRepository.AddReadingAsync((SensorReading)createSensorReading);
     }
 
-    public async Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(Guid sensorId)
+    public async Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(int sensorId)
     {
         var sensorReadingResponse = await _sensorReadingRepository.GetLatestReadingForSensorAsync(sensorId);
         if(sensorReadingResponse == null)
@@ -29,7 +29,7 @@ public class SensorReadingService : ISensorReadingService
         
     }
 
-    public async Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(Guid sensorId, int pageNumber)
+    public async Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(int sensorId, int pageNumber)
     {
         var readings = await _sensorReadingRepository.GetPaginatedSensorReadings(sensorId, pageNumber);
 
