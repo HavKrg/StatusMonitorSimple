@@ -16,8 +16,7 @@
 
 @if (@Model.Readings != null && @Model.Readings.Data != null && @Model.Readings.Data.Any())
 {
-    @await Html.PartialAsync("_SensorChart", Model)
-    ;
+    @await Html.PartialAsync("_SensorChart", Model);
 }
 else
 {

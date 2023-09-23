@@ -13,6 +13,7 @@ public class SensorResponse
     public required string Measurement { get; set; }
     public required int PageSize { get; set; }
     public required string Group { get; set; }
+    public required double Divider { get; set; }
     public SensorReadingResponse? LatestReading { get; set; }
     public List<SensorReadingResponse> Readings { get; set; } = new List<SensorReadingResponse>();
     public int TotalReadings => Readings.Count();
@@ -31,7 +32,8 @@ public class SensorResponse
             MaxReading = sensor.MaxReading,
             Measurement = sensor.Measurement,
             PageSize = sensor.PageSize,
-            Group = sensor.Group
+            Group = sensor.Group,
+            Divider = sensor.Divider
         };
     }
 

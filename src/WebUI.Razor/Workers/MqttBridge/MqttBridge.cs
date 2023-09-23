@@ -141,19 +141,31 @@ public class MqttBridge : BackgroundService
 
     private (SensorResponse? sensor, double value)? ValidateMessage(string logMessage, string topic, string message)
     {
-
+        
         var sensor = Sensors.FirstOrDefault(s => s.MqttTopic == topic);
+         // Ensure sensor.Divider is not zero to avoid DivideByZeroException
+        
 
         if (sensor == null)
         {
             _logger.LogError($"{logMessage}       Problem : No sensor with MQTT-topic {topic}");
             return null;
         }
+
+        if (sensor.Divider == 0)
+        {
+            _logger.LogError($"{logMessage}       Problem : Sensor divider is zero");
+            return null;
+        }
+
         if (!double.TryParse(message, out double value))
         {
             _logger.LogError($"{logMessage}       Problem : Message is not parsable to a double");
             return null;
         }
+
+        value /= sensor.Divider;
+
         if (value > sensor.MaxReading || value < sensor.MinReading)
         {
             _logger.LogError($"{logMessage}        Problem : Message is parsable to a double, but it's not within the sensors min/max value range");
