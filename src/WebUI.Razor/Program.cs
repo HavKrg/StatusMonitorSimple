@@ -12,6 +12,8 @@ using WebUI.Razor.Workers.MqttBridge;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Parse configurartion files from argument
 if (args.Length == 0)
