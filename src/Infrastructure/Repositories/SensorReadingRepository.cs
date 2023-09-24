@@ -26,6 +26,12 @@ public class SensorReadingRepository : ISensorReadingRepository
         return result > 0;
     }
 
+    public async Task<IEnumerable<SensorReading>> GetAllReadingsForSensorAsync(int sensorId)
+    {
+        return await _context.SensorReadings.Where(s => s.SensorId == sensorId).OrderBy(s => s.Created).ToListAsync();
+
+    }
+
     public async Task<SensorReading?> GetLatestReadingForSensorAsync(int sensorId)
     {
         var response = await _context.SensorReadings
