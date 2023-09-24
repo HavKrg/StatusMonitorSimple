@@ -52,7 +52,7 @@ public class MqttBridge : BackgroundService
                 .WithCredentials(_projectSettings.MqttUser, _projectSettings.MqttPassword)
                 .WithCleanSession()
                 .WithTlsOptions(tlsOptions)
-                .WithKeepAlivePeriod(TimeSpan.FromMinutes(600))
+                .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
                 .Build();
 
         var managedMqttClientOptions = new ManagedMqttClientOptionsBuilder()
@@ -64,6 +64,7 @@ public class MqttBridge : BackgroundService
             foreach (var sensor in Sensors)
             {
                 await _mqttClient.SubscribeAsync(sensor.MqttTopic);
+                _logger.LogInformation($"Subscribed to {sensor.MqttTopic}");
             }
         }
         catch (Exception ex)
@@ -90,14 +91,12 @@ public class MqttBridge : BackgroundService
         else
             _logger.LogInformation($"Disconnected from MQTT-broker '{_projectSettings.MqttBroker}'");
         
-        await Task.CompletedTask;
         
     }
 
     private async Task ConnectionFailed(ConnectingFailedEventArgs args)
     {
         _logger.LogCritical($"Failed to connect to broker\n '{args.Exception.Message}'\n '{args.ConnectResult.UserProperties}'\n'{args.ConnectResult.ResultCode}'");
-        await Task.CompletedTask;
     }
 
 
@@ -128,8 +127,6 @@ public class MqttBridge : BackgroundService
                     _logger.LogInformation($"{FormattedDateTime} : Successfully added reading for '{sensor.Group} - {sensor.Name}' : '{value} {sensor.Measurement}'");
             }
         }
-        await Task.CompletedTask;
-
     }
 
 

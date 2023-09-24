@@ -22,7 +22,10 @@ if (args.Length == 0)
     Environment.Exit(1);
 }
 else
-    builder.Configuration.AddJsonFile(args[0]);
+{
+        builder.Configuration.AddJsonFile(args[0]+"projectSettings.config", optional: false, reloadOnChange: true);
+        builder.Configuration.AddJsonFile(args[0]+"loggSettings.config", optional: false, reloadOnChange: true);
+}
 
 // Extract sensor-list from configuration
 var sensors = builder.Configuration.GetSection("Sensors").Get<List<CreateSensor>>();

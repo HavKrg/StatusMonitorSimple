@@ -42,7 +42,6 @@ public class IndexModel : PageModel
 
             SensorGroups.Add(sensorsInGroup);
         }
-        System.Console.WriteLine();
     }
 }
 

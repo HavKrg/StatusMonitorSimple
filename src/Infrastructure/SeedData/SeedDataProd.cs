@@ -4,6 +4,7 @@ using System.Text.Json;
 using Domain.Models;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.SeedData;
 
@@ -12,12 +13,17 @@ public static class SeedDataProd
     public static async void Initialize(string sensorsJson, string? requestMessage)
     {
         var sensors = JsonSerializer.Deserialize<IEnumerable<Sensor>>(sensorsJson);
-        System.Console.WriteLine("seeding data");
+        
         if (sensors == null || !sensors.Any())
         {
             System.Console.WriteLine("No sensor data provided");
             return;
         }
+
+        
+
+        if(string.IsNullOrWhiteSpace(requestMessage))
+            requestMessage = "no request message";
         Console.WriteLine(requestMessage);
         using (var context = new StatusMonitorDbContext())
         {
@@ -38,6 +44,7 @@ public static class SeedDataProd
             }
             else
             {
+                System.Console.WriteLine("creating database");
                 await context.Database.EnsureCreatedAsync();
             }
             
@@ -52,6 +59,7 @@ public static class SeedDataProd
                     await context.Sensors.AddAsync(sensor);
                 else
                 {
+                    System.Console.WriteLine($"adding sensor: {sensor.Group} - {sensor.Name}");
                     dBSensor.Update(sensor);
                 }
             }
