@@ -11,6 +11,7 @@
     <p>Min verdi: @Model.Sensor.MinReading</p>
     <p>Max verdi: @Model.Sensor.MaxReading</p>
     <p>Måleenhet: @Model.Sensor.Measurement</p>
+    <a asp-page="./Details" asp-page-handler="Download" asp-route-sensorId="@Model.Sensor.Id" class="btn btn-primary text-decoration-none">Download sensor-data</a>
 </div>
 
 
@@ -24,6 +25,8 @@ else
         <p>Ingen data tilgjengelig</p>
     </div>
 }
+
+
 
 
 <style>

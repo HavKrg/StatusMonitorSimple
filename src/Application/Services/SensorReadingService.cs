@@ -20,6 +20,13 @@ public class SensorReadingService : ISensorReadingService
         return await _sensorReadingRepository.AddReadingAsync((SensorReading)createSensorReading);
     }
 
+    public async Task<List<SensorReadingResponse?>> GetAllReadingsForSensorAsync(int sensorId)
+    {
+        var readings = await _sensorReadingRepository.GetAllReadingsForSensorAsync(sensorId);
+        var response = readings.Select(r => (SensorReadingResponse)r).ToList();
+        return response;
+    }
+
     public async Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(int sensorId)
     {
         var sensorReadingResponse = await _sensorReadingRepository.GetLatestReadingForSensorAsync(sensorId);
