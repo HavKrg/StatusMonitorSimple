@@ -1,6 +1,8 @@
 # StatusMonitor-Simple
 
-This is a simple web-application for sensor-data. It consists of a background-service running MQTTnet that subscribes to a list of mqtt-topics, and stores them in a sqlite-database, and a web-frontend that displays current and historic data. 
+This is a simple web-application for sensor-data. It consists of a background-service running MQTTnet that 
+subscribes to a list of mqtt-topics, and stores them in a sqlite-database, and a web-frontend that displays 
+current and historic data. 
 
 It needs access to two config-files at startup.
 
@@ -11,13 +13,16 @@ Examples of these files are in the /src/WebUI.Razor/Config-folder of this reposi
 
 ## The program takes two arguments at startup. 
  
-    The first is the folder-path of the folder that contains both the loggSettings.config and the projectSettings.config files. 
-    If these are not provided it will use the two example files located in the /src/WebUI.Razor/Config-folder of this repository. 
+    The first is the folder-path of the folder that contains both the loggSettings.config and the
+    projectSettings.config files. If these are not provided it will use the two example files 
+    located in the /src/WebUI.Razor/Config-folder of this repository. 
 
-    The second is a string that tells the program what to do with the database when it starts up, and it has three options:
+    The second is a string that tells the program what to do with the database when it starts up,
+    and it has three options:
+    
         - "fresh database" -> deletes the entire database and recreates it
         - "clear readings" -> deletes the existing sensor-readings for all sensors
-        - "" -> Any other string (or no string at all) only ensures that the database exists.
+        - "*" -> Any other string (or no string at all) only ensures that the database exists.
 
 ## Explanation of the projectSettings-file
 ```
