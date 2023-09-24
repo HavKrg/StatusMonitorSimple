@@ -35,16 +35,13 @@ public class MqttBridge : BackgroundService
             Sensors = sensors.OrderBy(s => s.Id);
         }
 
-        
         _mqttClient.ApplicationMessageReceivedAsync += HandleMessages;
         _mqttClient.ConnectingFailedAsync += ConnectionFailed;
         _mqttClient.ConnectionStateChangedAsync += ConnectionChanged;
 
-
         var tlsOptions = new MqttClientTlsOptionsBuilder()
             .UseTls()
             .Build();
-
 
         var mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(_projectSettings.MqttBroker, _projectSettings.MqttPort)

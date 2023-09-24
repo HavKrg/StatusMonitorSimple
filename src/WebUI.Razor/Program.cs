@@ -23,8 +23,10 @@ if (args.Length == 0)
 }
 else
 {
-        builder.Configuration.AddJsonFile(args[0]+"projectSettings.config", optional: false, reloadOnChange: true);
-        builder.Configuration.AddJsonFile(args[0]+"loggSettings.config", optional: false, reloadOnChange: true);
+        builder.Configuration.AddJsonFile(args[0]+"projectSettings.config", optional: true, reloadOnChange: true)
+                    .AddJsonFile("./Configuration/projectSettings.config", optional: false, reloadOnChange: true);
+        builder.Configuration.AddJsonFile(args[0]+"loggSettings.config", optional: true, reloadOnChange: true)
+                    .AddJsonFile("./Configuration/loggSettings.config", optional: false, reloadOnChange: true);
 }
 
 // Extract sensor-list from configuration
