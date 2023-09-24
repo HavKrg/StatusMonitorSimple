@@ -11,8 +11,8 @@ Examples of these files are in the /src/WebUI.Razor/Config-folder of this reposi
 
 ## The program takes two arguments at startup. 
  
-    The first is the folder-path of the folder that contains both the loggSettings.config and the projectSettings.config files. If these are not provided it will use the two example files located 
-    in the /src/WebUI.Razor/Config-folder of this repository. 
+    The first is the folder-path of the folder that contains both the loggSettings.config and the projectSettings.config files. 
+    If these are not provided it will use the two example files located in the /src/WebUI.Razor/Config-folder of this repository. 
 
     The second is a string that tells the program what to do with the database when it starts up, and it has three options:
         - "fresh database" -> deletes the entire database and recreates it
