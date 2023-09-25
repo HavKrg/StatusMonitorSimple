@@ -10,11 +10,12 @@ public class Sensor : BaseEntity
     public double MaxReading { get; set; }
     public string Measurement { get; set; }
     public int PageSize { get; set; }
+    public string Style { get; set; }
     public string Group { get; set; }
     public double Divider { get; set; }
     public IEnumerable<SensorReading> Readings { get; set; } = new List<SensorReading>();
     public Sensor(int id, string name, string description, string mqttTopic, double minReading, double maxReading, 
-                    string measurement, int pageSize, string group, double divider)
+                    string measurement, int pageSize, string style, string group, double divider)
     {
         Id = id;
         Name = name;
@@ -24,6 +25,7 @@ public class Sensor : BaseEntity
         MaxReading = maxReading;
         Measurement = measurement;
         PageSize = pageSize;
+        Style = style;
         Group = group;
         Divider = divider;
     }
@@ -37,6 +39,7 @@ public class Sensor : BaseEntity
         MaxReading = sensor.MaxReading;
         Measurement = sensor.Measurement;
         PageSize = sensor.PageSize;
+        Style = sensor.Style;
         Group = sensor.Group;
         Updated = DateTime.Now;
     }

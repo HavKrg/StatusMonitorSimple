@@ -23,10 +23,15 @@ if (args.Length == 0)
 }
 else
 {
-        builder.Configuration.AddJsonFile(args[0]+"projectSettings.config", optional: true, reloadOnChange: true)
-                    .AddJsonFile("./Configuration/projectSettings.config", optional: false, reloadOnChange: true);
-        builder.Configuration.AddJsonFile(args[0]+"loggSettings.config", optional: true, reloadOnChange: true)
-                    .AddJsonFile("./Configuration/loggSettings.config", optional: false, reloadOnChange: true);
+    if (!File.Exists(args[0] + "projectSettings.config"))
+        builder.Configuration.AddJsonFile("./Configuration/projectSettings.config", optional: false, reloadOnChange: true);
+    else
+        builder.Configuration.AddJsonFile(args[0] + "projectSettings.config", optional: true, reloadOnChange: true);
+
+    if (!File.Exists(args[0] + "loggSettings.config"))
+        builder.Configuration.AddJsonFile("./Configuration/loggSettings.config", optional: false, reloadOnChange: true);
+    else
+        builder.Configuration.AddJsonFile(args[0] + "loggSettings.config", optional: true, reloadOnChange: true);
 }
 
 // Extract sensor-list from configuration
@@ -67,7 +72,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
     var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
     System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
-    
+
     SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
 }
 if (app.Environment.IsDevelopment())
