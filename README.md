@@ -45,6 +45,7 @@ Examples of these files are in the /src/WebUI.Razor/Config-folder of this reposi
             "MaxReading": 500,                                      -> maximum reading for the sensor, values above this will not be recorded
             "Measurement": "cm",                                    -> measurement-type for the sensor readings. cm, kg, bar etc. only used in the web-UI
             "PageSize": 24,                                         -> page size used for pagination of data. determines the number of readings displayed in the chart
+            "Style": "gauge",                                       -> decides if latest sensor-reading is displayed as gauge or bar. "gauge" is gauge, anything else is bar.
             "Group": "group 1",                                     -> group-name. sensors with the same group is displayed together in the web-UI under the group-name
             "Divider": 1                                            -> used to convert a raw sensor-reading to a scaled reading. The incomming message is divided by this number it 
         },(...)                                                        is stored in the database. If this is handles by the mqtt-publisher, simply set it to 1
