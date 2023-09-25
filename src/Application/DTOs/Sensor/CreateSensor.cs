@@ -13,6 +13,7 @@ public class CreateSensor
     public required string Measurement { get; set; }
     public required string Group {get; set;} = "&nbsp;";
     public required int PageSize { get; set; }
+    public required string Style { get; set; }
     public required double Divider { get; set; }
 
     public static explicit operator Sensor(CreateSensor createSensor)
@@ -26,6 +27,7 @@ public class CreateSensor
             createSensor.MaxReading, 
             createSensor.Measurement,
             createSensor.PageSize,
+            createSensor.Style,
             createSensor.Group,
             createSensor.Divider
             );

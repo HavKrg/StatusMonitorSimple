@@ -13,6 +13,7 @@ public class SensorWithoutReadingsResponse
     public required double MaxReading { get; set; }
     public required string Measurement { get; set; }
     public required int PageSize { get; set; }
+    public required string Style { get; set; }
     public required string Group { get; set; }
 
     public static implicit operator SensorWithoutReadingsResponse?(Sensor? sensor)
@@ -29,6 +30,7 @@ public class SensorWithoutReadingsResponse
             MaxReading = sensor.MaxReading,
             Measurement = sensor.Measurement,
             PageSize = sensor.PageSize,
+            Style = sensor.Style,
             Group = sensor.Group
         };
     }
