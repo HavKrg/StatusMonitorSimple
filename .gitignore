@@ -398,4 +398,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Database
-*.db.*
+*.db
+.db-shm
+.db-wal

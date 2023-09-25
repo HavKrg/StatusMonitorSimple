@@ -1,43 +1,29 @@
 @model Application.Dtos.SensorResponse
 
-<div class="card @(Model.LatestReadingIsOld() ? "alert alert-danger" : "alert alert-success")"
-    style="width: 18rem; margin: 10px">
-    <a asp-page="./Sensors/Details" asp-route-sensorId="@Model.Id" class="card-link text-decoration-none">
 
+<div class="card" style="--card-bg-color: @(Model.LatestReading != null && Model.LatestReading.IsValid ? (Model.LatestReadingIsOld() ? "#f8d7da" : "#d4edda") : "#ffc107"); width: 18rem; margin: 10px; background-color: var(--card-bg-color);">
+    <a asp-page="./Sensors/Details" asp-route-sensorId="@Model.Id" class="card-link text-decoration-none">
         <div class="card-body text-center">
             <h3 class="card-title">@Model.Name</h3>
-
             @if (Model.LatestReading == null)
             {
                 <p>No readings yet</p>
             }
             else
             {
-
-
-
                 if (Model.Style.ToLower() == "gauge")
-
-
-
                 {
                     <div class="d-flex flex-column align-items-center justify-content-center">
-                        <div class="gauge" style="width: 200px; --rotation:83deg; --color:#0d6efd; --background:#e9ecef;">
+                        <div class="gauge"
+                            style="width: 200px; --rotation:@Model.GetLatestReadingPercentRotation()deg; --color:#0d6efd; --background:#e9ecef;">
                             <div class="percentage"></div>
-                            <div class="mask"></div>
-                            @* <span class="value">@Model.GetLatestReadingPercent() %</span> *@
+                            <div class="mask" style="background-color: var(--card-bg-color);"></div>
                         </div>
                     </div>
                     <h5 class="card-title p-3">@Model.LatestReading.Value @Model.Measurement</h5>
                     <p class="card-text">@Model.LatestReading.Created</p>
                 }
-
-
-
                 else
-
-
-
                 {
                     <div class="d-flex flex-column align-items-center justify-content-center">
                         <div title="Min: @Model.MinReading, Max: @Model.MaxReading" class="progress vertical">
@@ -55,6 +41,7 @@
     </a>
 </div>
 
+
 <style>
     a.card-link {
         color: inherit;
@@ -67,57 +54,4 @@
         /* Inherit the color from the parent on hover or make it whatever color you want */
         text-decoration: none;
     }
-
-    .gauge {
-    position: relative;
-    border-radius: 50%/100% 100% 0 0;
-    background-color: var(--color, #a22);
-    overflow: hidden;
-}
-.gauge:before{
-    content: "";
-    display: block;
-    padding-top: 50%;   /* ratio of 2:1*/
-}
-.gauge .chart {
-  overflow: hidden;
-}
-.gauge .mask {
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  bottom: 0;
-  top: 40%;
-  background-color: #fff;
-  border-radius: 50%/100% 100% 0 0;
-}
-
-.gauge .percentage {
-    position:  absolute;
-    top: -1px;
-    left: -1px;
-    bottom: 0;
-    right: -1px;
-    background-color: var(--background, #aaa);
-    transform:rotate(var(--rotation)); 
-    transform-origin: bottom center; 
-    transition-duration: 600;
-}
-.gauge:hover {
-  --rotation: 100deg;
-}
-.gauge .value {
-  position:absolute; bottom:0%; left:0;   
-  width:100%; 
-  text-align: center;
-}
-
-.gauge .min {
-  position:absolute; 
-  bottom:0; left:5%;   
-}
-.gauge .max {
-  position:absolute; 
-  bottom:0; right:5%;   
- }
 </style>

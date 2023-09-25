@@ -15,6 +15,7 @@ public class SensorResponse
     public required string Style { get; set; }
     public required string Group { get; set; }
     public required double Divider { get; set; }
+    public required int SecondsBeforeOldReading { get; set; }
     public SensorReadingResponse? LatestReading { get; set; }
     public List<SensorReadingResponse> Readings { get; set; } = new List<SensorReadingResponse>();
     public int TotalReadings => Readings.Count();
@@ -32,6 +33,7 @@ public class SensorResponse
             MinReading = sensor.MinReading,
             MaxReading = sensor.MaxReading,
             Measurement = sensor.Measurement,
+            SecondsBeforeOldReading = sensor.SecondsBeforeOldReading,
             PageSize = sensor.PageSize,
             Style = sensor.Style,
             Group = sensor.Group,
@@ -45,6 +47,15 @@ public class SensorResponse
             return null;
         return (int)((double)LatestReading.Value / MaxReading * 100);
     }
+
+    public int GetLatestReadingPercentRotation()
+    {
+        var latestReadingPercent= GetLatestReadingPercent();
+        if (latestReadingPercent== null)
+            return 0;
+        else
+            return (int)(latestReadingPercent * 1.8);
+    }
     
     public bool LatestReadingIsOld()
     {
@@ -52,7 +63,7 @@ public class SensorResponse
             return true;
         
         TimeSpan timeSinceLastReading = DateTime.Now.Subtract(LatestReading.Created);
-        if(timeSinceLastReading.TotalHours >= 3)
+        if(timeSinceLastReading.TotalSeconds >= SecondsBeforeOldReading)
             return true;
         return false;
     }

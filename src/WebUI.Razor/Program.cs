@@ -7,6 +7,7 @@ using Infrastructure;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.SeedData;
+using Microsoft.EntityFrameworkCore;
 using WebUI.Razor;
 using WebUI.Razor.Workers.MqttBridge;
 
@@ -54,12 +55,18 @@ else
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddDbContext<StatusMonitorDbContext>(options =>
+    options.UseSqlite($"Data Source={projectSettings.DatabasePath}"));
+    
 builder.Services.AddDbContext<StatusMonitorDbContext>();
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
 builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
 builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
 builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddHostedService<MqttBridge>();
+
+
 
 
 var app = builder.Build();
@@ -73,13 +80,13 @@ if (!app.Environment.IsDevelopment())
     var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
     System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
 
-    SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
+    SeedDataProd.Initialize(app.Services, sensorJson, args.Length > 1 ? args[1] : null);
 }
 if (app.Environment.IsDevelopment())
 {
     System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
     var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
-    SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
+    SeedDataProd.Initialize(app.Services, sensorJson, args.Length > 1 ? args[1] : null);
 }
 
 app.UseHttpsRedirection();

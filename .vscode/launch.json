@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/WebUI.Razor/bin/Debug/net8.0/WebUI.Razor.dll",
-            "args": ["invalid", "fresh database"],
+            // "args": ["invalid", "fresh database"],
             // "args": ["C:\\GitHub\\"],
-            //  "args": ["C:\\GitHub\\", "fresh database"],
+             "args": ["C:\\GitHub\\", "fresh database"],
             // "args": ["C:\\GitHub\\"],
             "cwd": "${workspaceFolder}/src/WebUI.Razor",
             "stopAtEntry": false,
@@ -21,8 +21,8 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                // "ASPNETCORE_ENVIRONMENT": "Development"
-                "ASPNETCORE_ENVIRONMENT": "Production"
+                "ASPNETCORE_ENVIRONMENT": "Development"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

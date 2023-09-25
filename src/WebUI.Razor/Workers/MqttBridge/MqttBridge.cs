@@ -110,12 +110,12 @@ public class MqttBridge : BackgroundService
 
         if (validationResult != null)
         {
-            var (sensor, value) = validationResult.Value;
+            var (sensor, value, isValid) = validationResult.Value;
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var sensorReadingService = scope.ServiceProvider.GetRequiredService<ISensorReadingService>();
-                if (!await sensorReadingService.AddReadingAsync(new CreateSensorReading { SensorId = sensor!.Id, Value = value }))
+                if (!await sensorReadingService.AddReadingAsync(new CreateSensorReading { SensorId = sensor!.Id, Value = value, IsValid =  isValid}))
                 {
                     _logger.LogError($"{FormattedDateTime} : Unable to add sensor reading to database");
                     return;
@@ -133,11 +133,17 @@ public class MqttBridge : BackgroundService
         throw new NotImplementedException();
     }
 
-    private (SensorResponse? sensor, double value)? ValidateMessage(string logMessage, string topic, string message)
+    /// <summary>
+    /// checks if the incomming message is good or not
+    /// </summary>
+    /// <param name="logMessage"></param>
+    /// <param name="topic"></param>
+    /// <param name="message"></param>
+    /// <returns>sensor for the mqtt-topic, parsed reading as a double, a bool representing whether the value is within the expected range of the sensor</returns>
+    private (SensorResponse? sensor, double value, bool isValid)? ValidateMessage(string logMessage, string topic, string message)
     {
         
         var sensor = Sensors.FirstOrDefault(s => s.MqttTopic == topic);
-         // Ensure sensor.Divider is not zero to avoid DivideByZeroException
         
 
         if (sensor == null)
@@ -145,13 +151,13 @@ public class MqttBridge : BackgroundService
             _logger.LogError($"{logMessage}       Problem : No sensor with MQTT-topic {topic}");
             return null;
         }
-
+         // Ensure sensor.Divider is not zero to avoid DivideByZeroException
         if (sensor.Divider == 0)
         {
             _logger.LogError($"{logMessage}       Problem : Sensor divider is zero");
             return null;
         }
-
+        // try to parse the incomming message to a double
         if (!double.TryParse(message, out double value))
         {
             _logger.LogError($"{logMessage}       Problem : Message is not parsable to a double");
@@ -160,12 +166,13 @@ public class MqttBridge : BackgroundService
 
         value /= sensor.Divider;
 
+        // check if the value is inside the expected range
         if (value > sensor.MaxReading || value < sensor.MinReading)
         {
             _logger.LogError($"{logMessage}        Problem : Message is parsable to a double, but it's not within the sensors min/max value range");
-            return null;
+            return (sensor, value, false);
         }
-        return (sensor, value);
+        return (sensor, value, true);
     }
 
     private static string FormattedDateTime => $"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToLongTimeString()}";

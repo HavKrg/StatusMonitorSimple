@@ -2,7 +2,7 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = @Model.ProjectSettings.ProjectName;
+    ViewData["Title"] = @Model._projectSettings.ProjectName;
 }
 
 <div class="container">
@@ -37,8 +37,17 @@
         }
     </div>
 </div>
+<div>
+    Størrelse Database: @Model.DatabaseSize kB
+</div>
 
 <style>
+    .groupname {
+        margin-top: 50;
+        min-height: 75px;
+    }
+
+    
     .vertical {
         width: 100px;
         /* Width of the progress bar */
@@ -57,8 +66,89 @@
         /* Position at the bottom */
     }
 
-    .groupname {
-        margin-top: 50;
-        min-height: 75px;
+    .horizontal {
+        width: 100px;
+        /* Width of the progress bar */
+        height: 25px;
+        /* Height of the progress bar */
+        position: relative;
+    }
+
+    .horizontal .progress-bar {
+        width: 0%;
+        /* Full width */
+        height: 100%;
+        /* Start out from zero height */
+        position: absolute;
+        bottom: 0;
+        /* Position at the bottom */
+    }
+
+    .gauge {
+        position: relative;
+        border-radius: 50%/100% 100% 0 0;
+        border-color: #b8daff;
+        background-color: var(--color, #0d6efd);
+        overflow: hidden;
+
+    }
+
+    .gauge:before {
+        content: "";
+        display: block;
+        padding-top: 50%;
+        /* ratio of 2:1*/
+        background-color: #0d6efd;
+    }
+
+    .gauge .chart {
+        overflow: hidden;
+    }
+
+    .gauge .mask {
+        position: absolute;
+        left: 20%;
+        right: 20%;
+        bottom: 0;
+        top: 40%;
+        background-color: #fff;
+        border-radius: 50%/100% 100% 0 0;
+        background-color: #d1e7dd;
+    }
+
+    .gauge .percentage {
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        bottom: 0;
+        right: -1px;
+        background-color: var(--background, #aaa);
+        transform: rotate(var(--rotation));
+        transform-origin: bottom center;
+        transition-duration: 600;
+    }
+
+    .gauge:hover {
+        --rotation: 100deg;
+    }
+
+    .gauge .value {
+        position: absolute;
+        bottom: 0%;
+        left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .gauge .min {
+        position: absolute;
+        bottom: 0;
+        left: 5%;
+    }
+
+    .gauge .max {
+        position: absolute;
+        bottom: 0;
+        right: 5%;
     }
 </style>
