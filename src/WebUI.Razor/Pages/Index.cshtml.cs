@@ -43,13 +43,13 @@ public class IndexModel : PageModel
 
             SensorGroups.Add(sensorsInGroup);
         }
-        var databasePath = _projectSettings.DatabasePath;
+        // var databasePath = _projectSettings.DatabasePath;
 
-        if(databasePath != null)
-        {
-            var DbFileInfo = new FileInfo(databasePath);
-            DatabaseSize = DbFileInfo.Length/1000;
-        }
+        // if(databasePath != null)
+        // {
+        //     var DbFileInfo = new FileInfo(databasePath);
+        //     DatabaseSize = DbFileInfo.Length/1000;
+        // }
 
         System.Console.WriteLine();
     }

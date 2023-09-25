@@ -4,15 +4,14 @@ using System.Text.Json;
 using Domain.Models;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.SeedData;
 
 public static class SeedDataProd
 {
-    public static async void Initialize(IServiceProvider serviceProvider, string sensorsJson, string? requestMessage)
-{
+    public static async void Initialize(string sensorsJson, string? requestMessage)
+    {
         var sensors = JsonSerializer.Deserialize<IEnumerable<Sensor>>(sensorsJson);
         
         if (sensors == null || !sensors.Any())
@@ -21,58 +20,50 @@ public static class SeedDataProd
             return;
         }
 
-
         if(string.IsNullOrWhiteSpace(requestMessage))
             requestMessage = "no request message";
         Console.WriteLine(requestMessage);
-
-        
-        var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<StatusMonitorDbContext>();
-
-        
-        
-        
-        
-        
-        if (requestMessage == "fresh database")
+        using (var context = new StatusMonitorDbContext())
         {
-            System.Console.WriteLine("deleting database");
-            await context.Database.EnsureDeletedAsync();
-            System.Console.WriteLine("creating database");
-            await context.Database.EnsureCreatedAsync();
-            System.Console.WriteLine("ensure created complete");
-        }
-        else if (requestMessage == "clear readings")
-        {
-            await context.Database.EnsureCreatedAsync();
-
-            System.Console.WriteLine("deleting readings");
-            context.SensorReadings.RemoveRange(context.SensorReadings);
-        }
-        else
-        {
-            System.Console.WriteLine("creating database");
-            await context.Database.EnsureCreatedAsync();
-        }
-
-
-        await context.SaveChangesAsync();
-
-
-        foreach (var sensor in sensors)
-        {
-            var dBSensor = await context.Sensors.FindAsync(sensor.Id);
-            if (dBSensor == null)
-                await context.Sensors.AddAsync(sensor);
+            if (requestMessage == "fresh database")
+            {
+                System.Console.WriteLine("deleting database");
+                await context.Database.EnsureDeletedAsync();
+                System.Console.WriteLine("creating database");
+                await context.Database.EnsureCreatedAsync();
+                System.Console.WriteLine("ensure created complete");
+            }
+            else if (requestMessage == "clear readings")
+            {
+                await context.Database.EnsureCreatedAsync();
+                
+                System.Console.WriteLine("deleting readings");
+                context.SensorReadings.RemoveRange(context.SensorReadings);
+            }
             else
             {
-                System.Console.WriteLine($"adding sensor: {sensor.Group} - {sensor.Name}");
-                dBSensor.Update(sensor);
+                System.Console.WriteLine("creating database");
+                await context.Database.EnsureCreatedAsync();
             }
-        }
+            
 
-        await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+
+
+            foreach (var sensor in sensors)
+            {
+                var dBSensor = await context.Sensors.FindAsync(sensor.Id);
+                if (dBSensor == null)
+                    await context.Sensors.AddAsync(sensor);
+                else
+                {
+                    System.Console.WriteLine($"adding sensor: {sensor.Group} - {sensor.Name}");
+                    dBSensor.Update(sensor);
+                }
+            }
+
+            await context.SaveChangesAsync();
+        }
 
     }
 }
