@@ -14,14 +14,15 @@ public class IndexModel : PageModel
     private readonly ISensorService _sensorService;
     public IEnumerable<SensorResponse> Sensors { get; set; }
     public List<List<SensorResponse>> SensorGroups { get; set; } = new List<List<SensorResponse>>();
-    public ProjectSettings ProjectSettings { get; set; }
+    public ProjectSettings _projectSettings { get; set; }
+    public long DatabaseSize { get; set; } = 0;
     
 
     public IndexModel(ILogger<IndexModel> logger, ISensorService sensorService, ProjectSettings projectSettings)
     {
         _logger = logger;
         _sensorService = sensorService;
-        ProjectSettings = projectSettings;
+        _projectSettings = projectSettings;
     }
 
 
@@ -42,6 +43,14 @@ public class IndexModel : PageModel
 
             SensorGroups.Add(sensorsInGroup);
         }
+        var databasePath = _projectSettings.DatabasePath;
+
+        if(databasePath != null)
+        {
+            var DbFileInfo = new FileInfo(databasePath);
+            DatabaseSize = DbFileInfo.Length/1000;
+        }
+
         System.Console.WriteLine();
     }
 }

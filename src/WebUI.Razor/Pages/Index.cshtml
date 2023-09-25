@@ -2,7 +2,7 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = @Model.ProjectSettings.ProjectName;
+    ViewData["Title"] = @Model._projectSettings.ProjectName;
 }
 
 <div class="container">
@@ -36,6 +36,9 @@
             }
         }
     </div>
+</div>
+<div>
+    Størrelse Database: @Model.DatabaseSize kB
 </div>
 
 <style>
