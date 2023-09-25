@@ -8,6 +8,7 @@ public class SensorReadingResponse
     public DateTime Updated { get; set; }
     public required int SensorId { get; set; }
     public required double Value { get; set; }
+    public required bool IsValid { get; set; }
 
     public static implicit operator SensorReadingResponse?(SensorReading? sensorReading)
     {
@@ -19,7 +20,8 @@ public class SensorReadingResponse
             Created = sensorReading.Created,
             Updated = sensorReading.Updated,
             SensorId = sensorReading.SensorId,
-            Value = sensorReading.Value
+            Value = sensorReading.Value,
+            IsValid = sensorReading.IsValid
         };
     }
 }

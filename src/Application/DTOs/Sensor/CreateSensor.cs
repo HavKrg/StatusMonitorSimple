@@ -15,6 +15,7 @@ public class CreateSensor
     public required int PageSize { get; set; }
     public required string Style { get; set; }
     public required double Divider { get; set; }
+    public required int SecondsBeforeOldReading { get; set; }
 
     public static explicit operator Sensor(CreateSensor createSensor)
     {
@@ -26,6 +27,7 @@ public class CreateSensor
             createSensor.MinReading, 
             createSensor.MaxReading, 
             createSensor.Measurement,
+            createSensor.SecondsBeforeOldReading,
             createSensor.PageSize,
             createSensor.Style,
             createSensor.Group,
