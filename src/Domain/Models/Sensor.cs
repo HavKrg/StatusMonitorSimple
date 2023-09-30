@@ -2,7 +2,7 @@
 namespace Domain.Models;
 public class Sensor : BaseEntity
 {
-
+    public int LocationId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string MqttTopic { get; set; }
@@ -15,10 +15,11 @@ public class Sensor : BaseEntity
     public string Group { get; set; }
     public double Divider { get; set; }
     public IEnumerable<SensorReading> Readings { get; set; } = new List<SensorReading>();
-    public Sensor(int id, string name, string description, string mqttTopic, double minReading, double maxReading, 
+    public Sensor(int id, int locationId, string name, string description, string mqttTopic, double minReading, double maxReading, 
                     string measurement, int secondsBeforeOldReading, int pageSize, string style, string group, double divider)
     {
         Id = id;
+        LocationId = locationId;
         Name = name;
         Description = description;
         MqttTopic = mqttTopic;

@@ -10,20 +10,21 @@ namespace Infrastructure.SeedData;
 
 public static class SeedDataProd
 {
-    public static async void Initialize(string sensorsJson, string? requestMessage)
+    public static async void Initialize(string locationsJson, string? requestMessage)
     {
-        var sensors = JsonSerializer.Deserialize<IEnumerable<Sensor>>(sensorsJson);
-        
-        if (sensors == null || !sensors.Any())
+        var locations = JsonSerializer.Deserialize<List<Location>>(locationsJson);
+        if (locations == null || locations.Count == 0)
         {
-            System.Console.WriteLine("No sensor data provided");
+            System.Console.WriteLine("No location data provided");
             return;
         }
 
         if(string.IsNullOrWhiteSpace(requestMessage))
             requestMessage = "no request message";
         Console.WriteLine(requestMessage);
-        using (var context = new StatusMonitorDbContext())
+        var optionsBuilder = new DbContextOptionsBuilder<StatusMonitorDbContext>();
+
+        using (var context = new StatusMonitorDbContext(optionsBuilder.Options))
         {
             if (requestMessage == "fresh database")
             {
@@ -50,15 +51,51 @@ public static class SeedDataProd
             await context.SaveChangesAsync();
 
 
-            foreach (var sensor in sensors)
+            foreach (var location in locations)
             {
-                var dBSensor = await context.Sensors.FindAsync(sensor.Id);
-                if (dBSensor == null)
-                    await context.Sensors.AddAsync(sensor);
+                var dBLocation = await context.Locations.FindAsync(location.Id);
+                if (dBLocation == null)
+                {
+                    System.Console.WriteLine($"adding location: {location.Name}");
+                    await context.Locations.AddAsync(location);
+                    var modbusStatus = new ModbusStatus(location.Id, false, 0, 0, 0, string.Empty, DateTime.MinValue);
+                    await context.ModbusStatuses.AddAsync(modbusStatus);
+                }
                 else
                 {
-                    System.Console.WriteLine($"adding sensor: {sensor.Group} - {sensor.Name}");
-                    dBSensor.Update(sensor);
+                    System.Console.WriteLine($"updating location: {location.Name}");
+                    dBLocation.Update(location);
+                }
+
+                foreach (var sensor in location.Sensors)
+                {
+                    sensor.LocationId = location.Id;
+                    var dbSensor = await context.Sensors.FindAsync(sensor.Id);
+                    if(dbSensor == null)
+                    {
+                        System.Console.WriteLine($"adding sensor: {sensor.Name}");
+                        await context.Sensors.AddAsync(sensor);
+                    }
+                    else
+                    {
+                        System.Console.WriteLine($"updating location: {sensor.Name}");
+                        dbSensor.Update(sensor);
+                    }
+                }
+                foreach (var alarm in location.Alarms)
+                {
+                    alarm.LocationId = location.Id;
+                    var dbAlarm = await context.Alarms.FindAsync(alarm.Id);
+                    if(dbAlarm == null)
+                    {
+                        System.Console.WriteLine($"adding sensor: {alarm.Name}");
+                        await context.Alarms.AddAsync(alarm);
+                    }
+                    else
+                    {
+                        System.Console.WriteLine($"updating location: {alarm.Name}");
+                        dbAlarm.Update(alarm);
+                    }
                 }
             }
 

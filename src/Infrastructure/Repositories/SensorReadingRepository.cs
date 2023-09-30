@@ -2,44 +2,37 @@
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
 public class SensorReadingRepository : ISensorReadingRepository
 {
+    private readonly ILogger<SensorReadingRepository> _logger;
     private readonly StatusMonitorDbContext _context;
 
-    public SensorReadingRepository(StatusMonitorDbContext context)
+    public SensorReadingRepository(ILogger<SensorReadingRepository> logger, StatusMonitorDbContext context)
     {
+        _logger = logger;
         _context = context;
     }
 
-    public async Task<bool> AddReadingAsync(SensorReading sensorReading)
+    public async Task<SensorReading> AddSensorReadingAsync(SensorReading sensorReading)
     {
-        bool sensorExists = await _context.Sensors.AnyAsync(s => s.Id == sensorReading.SensorId);
-        if (!sensorExists)
-            return false;
+        await  _context.SensorReadings.AddAsync(sensorReading);
+        await _context.SaveChangesAsync();
 
-        await _context.SensorReadings.AddAsync(sensorReading);
-        var result = await _context.SaveChangesAsync();
-
-        return result > 0;
+        return sensorReading;
     }
 
-    public async Task<IEnumerable<SensorReading>> GetAllReadingsForSensorAsync(int sensorId)
+    public async Task<IEnumerable<SensorReading>> GetAllSensorReadingsForSensorAsync(int sensorId)
     {
-        return await _context.SensorReadings.Where(s => s.SensorId == sensorId).OrderBy(s => s.Created).ToListAsync();
-
+        return await _context.SensorReadings.Where(a => a.SensorId == sensorId).ToListAsync();
     }
 
     public async Task<SensorReading?> GetLatestReadingForSensorAsync(int sensorId)
     {
-        var response = await _context.SensorReadings
-                            .Where(s => s.SensorId == sensorId)
-                            .OrderByDescending(s => s.Created)
-                            .FirstOrDefaultAsync();
-
-        return response;
+        return await _context.SensorReadings.OrderByDescending(s => s.Created).Where(s => s.SensorId == sensorId).FirstOrDefaultAsync();
     }
 
     public async Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(int sensorId, int pageNumber)
@@ -75,5 +68,10 @@ public class SensorReadingRepository : ISensorReadingRepository
         }
 
         return result;
-    }   
+    }
+
+    public async Task<SensorReading?> GetSensorReadingByIdAsync(int sensorReadingId)
+    {
+        return await _context.SensorReadings.FindAsync(sensorReadingId);
+    }
 }

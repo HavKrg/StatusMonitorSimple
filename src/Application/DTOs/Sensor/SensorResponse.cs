@@ -5,6 +5,7 @@ namespace Application.Dtos;
 public class SensorResponse
 {
     public int Id { get; set; }
+    public int LocationId { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
@@ -16,6 +17,8 @@ public class SensorResponse
     public required string Group { get; set; }
     public required double Divider { get; set; }
     public required int SecondsBeforeOldReading { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime Updated { get; set; }
     public SensorReadingResponse? LatestReading { get; set; }
     public List<SensorReadingResponse> Readings { get; set; } = new List<SensorReadingResponse>();
     public int TotalReadings => Readings.Count();
@@ -27,6 +30,7 @@ public class SensorResponse
         return new SensorResponse
         {
             Id = sensor.Id,
+            LocationId = sensor.LocationId,
             Name = sensor.Name,
             Description = sensor.Description,
             MqttTopic = sensor.MqttTopic,
@@ -37,7 +41,9 @@ public class SensorResponse
             PageSize = sensor.PageSize,
             Style = sensor.Style,
             Group = sensor.Group,
-            Divider = sensor.Divider
+            Divider = sensor.Divider,
+            Created = sensor.Created,
+            Updated = sensor.Updated
         };
     }
 

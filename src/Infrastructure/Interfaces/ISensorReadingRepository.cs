@@ -4,9 +4,9 @@ namespace Infrastructure.Interfaces;
 
 public interface ISensorReadingRepository
 {
-    Task<bool> AddReadingAsync(SensorReading sensorReading);
+    Task<SensorReading> AddSensorReadingAsync(SensorReading sensorReading);
+    Task<SensorReading?> GetSensorReadingByIdAsync(int sensorReadingId);
+    Task<IEnumerable<SensorReading>> GetAllSensorReadingsForSensorAsync(int sensorId);
     Task<SensorReading?> GetLatestReadingForSensorAsync(int sensorId);
     Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(int sensorId, int pageNumber);
-    Task<IEnumerable<SensorReading>> GetAllReadingsForSensorAsync(int sensorId);
-
 }

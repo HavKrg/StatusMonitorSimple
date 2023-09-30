@@ -16,6 +16,8 @@ public class SensorWithoutReadingsResponse
     public required int PageSize { get; set; }
     public required string Style { get; set; }
     public required string Group { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime Updated { get; set; }
 
     public static implicit operator SensorWithoutReadingsResponse?(Sensor? sensor)
     {
@@ -33,7 +35,9 @@ public class SensorWithoutReadingsResponse
             SecondsBeforeOldReading = sensor.SecondsBeforeOldReading,
             PageSize = sensor.PageSize,
             Style = sensor.Style,
-            Group = sensor.Group
+            Group = sensor.Group,
+            Created = sensor.Created,
+            Updated = sensor.Updated
         };
     }
 

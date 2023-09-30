@@ -1,33 +1,43 @@
 ﻿using Domain.Models;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
 public class SensorRepository : ISensorRepository
 {
+    private readonly ILogger<SensorRepository> _logger;
     private readonly StatusMonitorDbContext _context;
 
-    public SensorRepository(StatusMonitorDbContext context)
+    public SensorRepository(ILogger<SensorRepository> logger, StatusMonitorDbContext context)
     {
+        _logger = logger;
         _context = context;
     }
 
-    public async Task<Sensor> CreateSensorAsync(Sensor sensor)
+    public async Task<Sensor> AddSensorAsync(Sensor sensor)
     {
-        await _context.Sensors.AddAsync(sensor);
+        await _context.AddAsync(sensor);
         await _context.SaveChangesAsync();
         return sensor;
     }
 
-    public async Task<IEnumerable<Sensor>> GetAllSensorsAsync()
+    public async Task DeleteSensorAsync(int sensorId)
     {
-        return await _context.Sensors.ToListAsync();
+        var sensor = await _context.Sensors.FindAsync(sensorId);
+        _context.Sensors.Remove(sensor);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Sensor>> GetAllSensorsForLocationAsync(int locationId)
+    {
+        return await _context.Sensors.Where(s => s.LocationId == locationId).ToListAsync();
     }
 
     public async Task<Sensor?> GetSensorByIdAsync(int sensorId)
     {
-        return await _context.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
+        return await _context.Sensors.FindAsync(sensorId);
     }
 
     public async Task UpdateSensorAsync(Sensor sensor)
@@ -36,12 +46,13 @@ public class SensorRepository : ISensorRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteSensorAsync(int sensorId)
+    public async Task<IEnumerable<Sensor>> GetAllSensorsAsync()
     {
-        var sensor = await _context.Sensors.FindAsync(sensorId);
-        if (sensor == null)
-            return;
-        _context.Sensors.Remove(sensor);
-        await _context.SaveChangesAsync();
+        return await _context.Sensors.ToListAsync();
+    }
+
+    public Task<Sensor?> GetSensorByMqttTopicAsync(string mqttTopic)
+    {
+        return _context.Sensors.FirstOrDefaultAsync(s => s.MqttTopic == mqttTopic);
     }
 }

@@ -11,7 +11,22 @@
             }
             else
             {
-                if (Model.Style.ToLower() == "gauge")
+                @if(Model.Style.ToLower() == "alarm")
+                {
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        @if(@Model.LatestReading.Value == 1)
+                        {
+                            <div>ALARM</div>
+                        }
+                        else
+                        {
+                            <div>no alarm</div>
+                        }
+                    </div>
+                    <h5 class="card-title p-3">@Model.LatestReading.Value @Model.Measurement</h5>
+                    <p class="card-text">@Model.LatestReading.Created</p>
+                }
+                else if (Model.Style.ToLower() == "gauge")
                 {
                     <div class="d-flex flex-column align-items-center justify-content-center">
                         <div class="gauge"

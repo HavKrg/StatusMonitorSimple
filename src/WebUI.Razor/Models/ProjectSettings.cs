@@ -1,4 +1,4 @@
-﻿namespace WebUI.Razor;
+﻿namespace WebUI.Razor.Models;
 
 public class ProjectSettings
 {

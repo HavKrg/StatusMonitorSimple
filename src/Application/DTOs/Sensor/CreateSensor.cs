@@ -5,6 +5,7 @@ namespace Application.Dtos;
 public class CreateSensor
 {
     public int Id { get; set; }
+    public int LocationId { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
@@ -21,6 +22,7 @@ public class CreateSensor
     {
         return new Sensor(
             createSensor.Id,
+            createSensor.LocationId,
             createSensor.Name,
             createSensor.Description, 
             createSensor.MqttTopic, 

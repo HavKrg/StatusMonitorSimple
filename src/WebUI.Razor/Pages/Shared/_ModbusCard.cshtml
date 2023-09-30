@@ -1,0 +1,12 @@
+@model Application.Dtos.ModbusStatusResponse;
+
+
+<p>Result of last reading: @Model.Success</p>
+<p>Total readings: @Model.AttemptedModbusReadings</p>
+<p>Successfull readings: @Model.SuccessfullModbusReadings</p>
+<p>Failed readings: @Model.FailedModbusReadings</p>
+@if (@Model.FailedModbusReadings != 0)
+{
+    <p>Time of last failed modbusreading: @Model.TimeOfLastFailedReading</p>
+    <p>Last error message: @Model.ErrorMessage</p>
+}

@@ -1,4 +1,4 @@
-﻿@inject ProjectSettings projectSettings
+﻿@inject WebUI.Razor.Models.ProjectSettings projectSettings
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,18 +12,14 @@
 
 </head>
 <body>
-    <header style="margin-bottom: 20px">
-        <div class="text-center">
-            <h1 class="display-1">
-                <a class="text-decoration-none text-reset" asp-area="" asp-page="/Index">@projectSettings.ProjectName</a>
-            </h1>
-        </div>
-    </header>
+    <partial name="_Header" />
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+    <partial name="_Footer" />
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

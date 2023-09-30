@@ -4,6 +4,7 @@ namespace Application.Dtos;
 
 public class SensorReadingResponse
 {
+    public int Id { get; set; }
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
     public required int SensorId { get; set; }
@@ -17,6 +18,7 @@ public class SensorReadingResponse
             
         return new SensorReadingResponse
         {
+            Id = sensorReading.Id,
             Created = sensorReading.Created,
             Updated = sensorReading.Updated,
             SensorId = sensorReading.SensorId,
