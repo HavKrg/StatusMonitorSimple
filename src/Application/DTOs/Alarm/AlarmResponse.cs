@@ -1,6 +1,3 @@
-using Domain.Models;
-using WebUI.Razor.Models;
-
 namespace Application.Dtos;
 
 public class AlarmResponse
@@ -15,10 +12,11 @@ public class AlarmResponse
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
 
-    public static implicit operator AlarmResponse?(Alarm? alarm)
+    public static implicit operator AlarmResponse(Alarm? alarm)
     {
         if(alarm == null)
-            return null;
+            throw new ArgumentNullException($"'{nameof(Alarm)}': Alarm cannot be null");
+
         return new AlarmResponse
         {
             Id = alarm.Id,

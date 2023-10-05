@@ -53,4 +53,9 @@ public class SensorReadingService : ISensorReadingService
             Data = readings.Data.Select(r => (SensorReadingResponse)r).ToList()
         };
     }
+
+    public async Task DeleteAllSensorReadingsAsync()
+    {
+        await _sensorReadingRepository.DeleteAllSensorReadingsAsync();
+    }
 }

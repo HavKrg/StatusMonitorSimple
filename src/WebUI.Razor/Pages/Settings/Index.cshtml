@@ -1,0 +1,11 @@
+﻿@page
+@model WebUI.Razor.Pages.Settings.IndexModel
+@{
+}
+
+<form method="post" onsubmit="return confirm('Are you sure you want to delete all sensor readings?');">
+    <input type="submit" value="Delete All Readings" asp-page-handler="DeleteAllSensorReadings" />
+</form>
+
+
+<p>Size of database: @Model.DbSize kB</p>

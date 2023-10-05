@@ -17,41 +17,58 @@ public class AlarmRepository : IAlarmRepository
 
     public async Task<Alarm> AddAlarmAsync(Alarm alarm)
     {
+        if(alarm == null)
+            throw new ArgumentNullException(nameof(alarm), $"'{nameof(AddAlarmAsync)}': Alarm cannot be null");
         await _context.Alarms.AddAsync(alarm);
         await _context.SaveChangesAsync();
         return alarm;
+    }
+    public async Task<List<Alarm>> GetAllAlarmsAsync()
+    {
+        return await _context.Alarms.ToListAsync();
+    }
+
+    public async Task<Alarm?> GetAlarmByIdAsync(int alarmId)
+    {
+        var alarm = await _context.Alarms.FindAsync(alarmId);
+        if (alarm == null)
+            throw new KeyNotFoundException($"'{nameof(GetAlarmByIdAsync)}': No Alarm found with ID '{alarmId}'");
+        return alarm;
+    }
+
+    public async Task<List<Alarm>> GetAllAlarmsForLocationAsync(int locationId)
+    {
+        var alarms = await _context.Alarms.Where(alarm => alarm.LocationId == locationId).ToListAsync();
+        return alarms;
+    }
+
+    public async Task<Alarm?> GetAlarmByMqttTopicAsync(string mqttTopic)
+    {
+        var alarm = await _context.Alarms.FirstOrDefaultAsync(a => a.MqttTopic == mqttTopic);
+        if (alarm == null)
+            throw new KeyNotFoundException($"'{nameof(GetAlarmByMqttTopicAsync)}: No Alarm found with MqttTopic '{mqttTopic}'");
+
+        return alarm;
+    }
+
+    public async Task UpdateAlarmAsync(Alarm alarm)
+    {
+        var existingAlarm = await _context.Alarms.FindAsync(alarm.Id);
+        if(existingAlarm == null)
+            throw new KeyNotFoundException($"'{nameof(UpdateAlarmAsync)}': No Alarm found with ID '{alarm.Id}'");
+            
+        _context.Entry(alarm).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAlarmAsync(int alarmId)
     {
         var alarm = await _context.Alarms.FindAsync(alarmId);
 
-        if (alarm != null)
-            _context.Remove(alarm);
+        if (alarm == null)
+            throw new KeyNotFoundException($"'{nameof(DeleteAlarmAsync)}': No Alarm found with ID '{alarmId}'");
 
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<Alarm?> GetAlarmByIdAsync(int alarmId)
-    {
-        return await _context.Alarms.FindAsync(alarmId);
-
-    }
-
-    public async Task<IEnumerable<Alarm>> GetAllAlarmsForLocationAsync(int locationId)
-    {
-        return await _context.Alarms.Where(a => a.LocationId == locationId).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Alarm>> GetAllAlarmsAsync()
-    {
-        return await _context.Alarms.ToListAsync();
-    }
-
-    public async Task UpdateAlarmAsync(Alarm alarm)
-    {
-        _context.Entry(alarm).State = EntityState.Modified;
-
+        _context.Alarms.Remove(alarm);
         await _context.SaveChangesAsync();
     }
 
@@ -59,18 +76,10 @@ public class AlarmRepository : IAlarmRepository
     {
         var alarm = await _context.Alarms.FindAsync(alarmId);
         if (alarm == null)
-        {
-            throw new ArgumentException($"No alarm found with ID {alarmId}", nameof(alarmId));
-        }
+            throw new KeyNotFoundException($"'{nameof(SetAlarmStatusAsync)}': No Alarm found with ID '{alarmId}'");
 
         alarm.Status = status;
         alarm.Updated = DateTime.Now;
         await _context.SaveChangesAsync();
-    }
-
-    public async Task<Alarm?> GetAlarmByMqttTopicAsync(string mqttTopic)
-    {
-        return await _context.Alarms.FirstOrDefaultAsync(a => a.MqttTopic == mqttTopic);
-        
     }
 }

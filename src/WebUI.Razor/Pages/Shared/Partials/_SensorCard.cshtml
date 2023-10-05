@@ -1,7 +1,28 @@
 @model Application.Dtos.SensorResponse
+@{
+    var cardBgColor = string.Empty;
+    if(Model.LatestReading == null)
+        cardBgColor = "#ffc107";
+    else if (Model.LatestReadingIsOld())
+        cardBgColor = "#f8d7da";
+    else
+        cardBgColor = "#d4edda";
+}
 
-
-<div class="card" style="--card-bg-color: @(Model.LatestReading != null && Model.LatestReading.IsValid ? (Model.LatestReadingIsOld() ? "#f8d7da" : "#d4edda") : "#ffc107"); width: 18rem; margin: 10px; background-color: var(--card-bg-color);">
+@if(Model.LatestReading == null)
+{
+<div class="card" style="height: 10rem; width: 20rem; margin: 10px; padding: 1px; background-color: @cardBgColor;">
+    <a asp-page="./Sensors/Details" asp-route-sensorId="@Model.Id" class="card-link text-decoration-none">
+        <div class="card-body text-center">
+            <h3 class="card-title">@Model.Name</h3>
+                <p>No readings yet</p>
+        </div>
+    </a>
+</div>
+}
+else if(Model.LatestReading != null)
+{
+<div class="card" style="height: 18rem; width: 20rem; margin: 10px; padding: 1px; background-color: @cardBgColor">
     <a asp-page="./Sensors/Details" asp-route-sensorId="@Model.Id" class="card-link text-decoration-none">
         <div class="card-body text-center">
             <h3 class="card-title">@Model.Name</h3>
@@ -11,25 +32,10 @@
             }
             else
             {
-                @if(Model.Style.ToLower() == "alarm")
+                @if (Model.Style.ToLower() == "gauge")
                 {
                     <div class="d-flex flex-column align-items-center justify-content-center">
-                        @if(@Model.LatestReading.Value == 1)
-                        {
-                            <div>ALARM</div>
-                        }
-                        else
-                        {
-                            <div>no alarm</div>
-                        }
-                    </div>
-                    <h5 class="card-title p-3">@Model.LatestReading.Value @Model.Measurement</h5>
-                    <p class="card-text">@Model.LatestReading.Created</p>
-                }
-                else if (Model.Style.ToLower() == "gauge")
-                {
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                        <div class="gauge"
+                        <div class="gauge" aria-valuenow="@Model.GetLatestReadingPercent()" aria-valuemin="@Model.MinReading" aria-valuemax="@Model.MaxReading"
                             style="width: 200px; --rotation:@Model.GetLatestReadingPercentRotation()deg; --color:#0d6efd; --background:#e9ecef;">
                             <div class="percentage"></div>
                             <div class="mask" style="background-color: var(--card-bg-color);"></div>
@@ -38,12 +44,11 @@
                     <h5 class="card-title p-3">@Model.LatestReading.Value @Model.Measurement</h5>
                     <p class="card-text">@Model.LatestReading.Created</p>
                 }
-                else
+                else if(Model.Style.ToLower() == "bar")
                 {
                     <div class="d-flex flex-column align-items-center justify-content-center">
                         <div title="Min: @Model.MinReading, Max: @Model.MaxReading" class="progress vertical">
-                            <div class="progress-bar" role="progressbar" aria-valuenow="@Model.GetLatestReadingPercent()"
-                                aria-valuemin="@Model.MinReading" aria-valuemax="@Model.MaxReading"
+                            <div class="progress-bar" role="progressbar" aria-valuenow="@Model.GetLatestReadingPercent()" aria-valuemin="@Model.MinReading" aria-valuemax="@Model.MaxReading"
                                 style="height: @Model.GetLatestReadingPercent()%">
                             </div>
                         </div>
@@ -55,18 +60,4 @@
         </div>
     </a>
 </div>
-
-
-<style>
-    a.card-link {
-        color: inherit;
-        /* Inherit the color from the parent element or make it whatever color you want */
-        text-decoration: none;
-    }
-
-    a.card-link:hover {
-        color: inherit;
-        /* Inherit the color from the parent on hover or make it whatever color you want */
-        text-decoration: none;
-    }
-</style>
+}

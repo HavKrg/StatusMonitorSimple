@@ -1,4 +1,4 @@
-using WebUI.Razor.Models;
+using Application.Dtos;
 
 namespace Application.Interfaces;
 
@@ -6,7 +6,7 @@ public interface ILocationService
 {
     Task<LocationResponse> AddLocationAsync(CreateLocation createLocation);
     Task<LocationResponse?> GetLocationByIdAsync(int locationId);
-    Task<IEnumerable<LocationResponse>> GetAllLocationsAsync();
+    Task<List<LocationResponse>> GetAllLocationsAsync();
     Task UpdateLocationAsync(CreateLocation updateLocation);
     Task DeleteLocationAsync(int locationId);
 }

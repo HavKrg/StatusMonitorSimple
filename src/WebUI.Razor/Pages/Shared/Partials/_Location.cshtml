@@ -1,0 +1,45 @@
+@model Application.Dtos.LocationResponse;
+
+@{
+    var location = @Model;
+    var alarmSectionId = $"alarmSection-{@Model.LocationId}";
+}
+
+<div class="container" style="margin-top: 2rem;">
+    <div class="container">
+        <h1 class="display-4 row d-flex align-items-center justify-content-center groupname">@location.Name</h1>
+        @if (location.ModbusStatus != null)
+        {
+            await Html.RenderPartialAsync("~/Pages/Shared/Partials/_ModbusCard.cshtml", location.ModbusStatus);
+
+        }
+    </div>
+    <div class="container">
+        <div class="row d-flex align-items-center justify-content-center">
+            @foreach (var sensor in location.Sensors)
+            {
+                await Html.RenderPartialAsync("~/Pages/Shared/Partials/_SensorCard.cshtml", sensor);
+            }
+        </div>
+        <h6 class="display-6 row d-flex align-items-center justify-content-center groupname" onclick='toggleDisplayMode("@alarmSectionId")'>
+            alarm-status
+        </h6>
+        <div class="row d-flex align-items-center justify-content-center" id='@alarmSectionId' style="display: none;">
+            @foreach (var alarm in location.Alarms)
+            {
+                await Html.RenderPartialAsync("~/Pages/Shared/Partials/_AlarmCard.cshtml", alarm);
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDisplayMode(contentId) {
+        var x = document.getElementById(contentId);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>

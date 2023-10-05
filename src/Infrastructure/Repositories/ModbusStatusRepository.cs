@@ -22,9 +22,11 @@ public class ModbusStatusRepository : IModbusStatusRepository
 
     public async Task UpdateModbusStatusAsync(ModbusStatus updatedModbusStatus)
     {
+        if(updatedModbusStatus == null)
+            throw new ArgumentNullException(nameof(updatedModbusStatus), $"'{nameof(UpdateModbusStatusAsync)}': ModbusStatus reading cannot be null");
         var modbusStatus = await _context.ModbusStatuses.FirstOrDefaultAsync(m => m.LocationId == updatedModbusStatus.LocationId);
         if(modbusStatus == null)
-            throw new  NullReferenceException($"no modbusstatus with locationId {updatedModbusStatus.LocationId}");
+            throw new KeyNotFoundException($"'{nameof(UpdateModbusStatusAsync)}': No ModbusStatus found with ID '{updatedModbusStatus.Id}'");
 
         modbusStatus.Update(updatedModbusStatus);
         _context.Entry(modbusStatus).State  = EntityState.Modified;

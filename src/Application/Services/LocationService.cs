@@ -1,8 +1,8 @@
+using Application.Dtos;
 using Application.Interfaces;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.Logging;
-using WebUI.Razor.Models;
 
 namespace Application.Services;
 
@@ -27,7 +27,7 @@ public class LocationService : ILocationService
         await _locationRepository.DeleteLocationAsync(locationId);
     }
 
-    public async Task<IEnumerable<LocationResponse>> GetAllLocationsAsync()
+    public async Task<List<LocationResponse>> GetAllLocationsAsync()
     {
         var locations = await _locationRepository.GetAllLocationsAsync();
         return locations.Select(location => (LocationResponse)location).ToList();

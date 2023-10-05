@@ -1,7 +1,7 @@
 using Application.Dtos;
 using Domain.Models;
 
-namespace WebUI.Razor.Models;
+namespace Application.Dtos;
 
 public class CreateLocation
 {

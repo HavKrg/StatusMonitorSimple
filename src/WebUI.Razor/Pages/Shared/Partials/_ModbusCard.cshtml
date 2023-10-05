@@ -1,0 +1,34 @@
+@model Application.Dtos.ModbusStatusResponse;
+
+@{
+    var modbusStatus = Model;
+    var elementId = $"modbusDetails-{@modbusStatus.LocationId}";
+}
+<div class="container">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="margin-top: 1rem; margin-bottom: 1rem;">
+        @if (@modbusStatus.Success)
+        {
+            <button type="button" class="btn btn-success btn-sm" onclick='toggleDisplayMode("@elementId")'>Modbus ok</button>
+        }
+        else if(@modbusStatus.AttemptedModbusReadings == 0)
+        {
+            <button type="button" class="btn btn-outline-success btn-sm" onclick='toggleDisplayMode("@elementId")'>Modbus</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-warning btn-sm" onclick='toggleDisplayMode("@elementId")'>Modbus warning</button>
+        }
+
+    </div>
+    <div class="text-center" id="@elementId" style="display: none;">
+        <p>Total readings: @modbusStatus.AttemptedModbusReadings</p>
+        <p>Successfull readings: @modbusStatus.SuccessfullModbusReadings</p>
+        <p>Failed readings: @modbusStatus.FailedModbusReadings</p>
+        @if (@modbusStatus.FailedModbusReadings != 0)
+        {
+            <p>Time of last failed modbusreading: @modbusStatus.TimeOfLastFailedReading</p>
+            <p>Last error message: @modbusStatus.ErrorMessage</p>
+        }
+    </div>
+</div>
+

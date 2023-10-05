@@ -8,8 +8,8 @@ public interface ISensorRepository
     Task<Sensor> AddSensorAsync(Sensor sensor);
     Task<Sensor?> GetSensorByIdAsync(int sensorId);
     Task<Sensor?> GetSensorByMqttTopicAsync(string mqttTopic);
-    Task<IEnumerable<Sensor>> GetAllSensorsForLocationAsync(int locationId);
-    Task<IEnumerable<Sensor>> GetAllSensorsAsync();
+    Task<List<Sensor>> GetAllSensorsForLocationAsync(int locationId);
+    Task<List<Sensor>> GetAllSensorsAsync();
     Task UpdateSensorAsync(Sensor sensor);
     Task DeleteSensorAsync(int sensorId);
 }

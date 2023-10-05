@@ -16,7 +16,7 @@ public class AlarmService : IAlarmService
         _alarmRepository = alarmRepository;
     }
 
-    public async Task<AlarmResponse> AddAlarmAsync(CreateAlarm createAlarm)
+    public async Task<AlarmResponse?> AddAlarmAsync(CreateAlarm createAlarm)
     {
         return await _alarmRepository.AddAlarmAsync((Alarm)createAlarm);
     }
@@ -37,16 +37,14 @@ public class AlarmService : IAlarmService
         return alarm;
     }
 
-    public async Task<IEnumerable<AlarmResponse>> GetAllAlarmForLocationAsync(int locationId)
+    public async Task<List<AlarmResponse>> GetAllAlarmsForLocationAsync(int locationId)
     {
         var alarms = await _alarmRepository.GetAllAlarmsForLocationAsync(locationId);
-
-        var response = alarms.Select(alarm => (AlarmResponse)alarm).ToList();
         
-        return response;
+        return alarms.Select(alarm => (AlarmResponse)alarm).ToList();
     }
 
-    public async Task<IEnumerable<AlarmResponse>> GetAllAlarmsAsync()
+    public async Task<List<AlarmResponse>> GetAllAlarmsAsync()
     {
         var alarms = await _alarmRepository.GetAllAlarmsAsync();
         var response = alarms.Select(alarm => (AlarmResponse)alarm).ToList();

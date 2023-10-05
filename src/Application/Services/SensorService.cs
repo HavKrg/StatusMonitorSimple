@@ -31,13 +31,13 @@ public class SensorService : ISensorService
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<SensorResponse>> GetAllSensorsAsync()
+    public async Task<List<SensorResponse>> GetAllSensorsAsync()
     {
         var sensors = await _sensorRespository.GetAllSensorsAsync();
         return sensors.Select(sensor => (SensorResponse)sensor).ToList();
     }
 
-    public async Task<IEnumerable<SensorResponse>> GetAllSensorsForLocationAsync(int locationId)
+    public async Task<List<SensorResponse>> GetAllSensorsForLocationAsync(int locationId)
     {
         var sensors = await _sensorRespository.GetAllSensorsForLocationAsync(locationId);
 

@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
+
 // Parse configurartion files from argument
 if (args.Length == 0)
 {
@@ -25,19 +26,10 @@ if (args.Length == 0)
 }
 else
 {
-    if (!File.Exists(args[0] + "projectSettings.config"))
-        builder.Configuration.AddJsonFile("./Configuration/projectSettings.config", optional: false, reloadOnChange: true);
-    else
-        builder.Configuration.AddJsonFile(args[0] + "projectSettings.config", optional: true, reloadOnChange: true);
-
-    if (!File.Exists(args[0] + "loggSettings.config"))
-        builder.Configuration.AddJsonFile("./Configuration/loggSettings.config", optional: false, reloadOnChange: true);
-    else
-        builder.Configuration.AddJsonFile(args[0] + "loggSettings.config", optional: true, reloadOnChange: true);
-    if (!File.Exists(args[0] + "sensors.config"))
-        builder.Configuration.AddJsonFile("./Configuration/sensors.config", optional: false, reloadOnChange: true);
-    else
-        builder.Configuration.AddJsonFile(args[0] + "sensors.config", optional: true, reloadOnChange: true);
+    System.Console.WriteLine($"Getting config-files from {args[0]}");
+    builder.Configuration.AddJsonFile(args[0] + "projectSettings.config", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile(args[0] + "loggSettings.config", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile(args[0] + "sensors.json", optional: true, reloadOnChange: true);
 }
 
 

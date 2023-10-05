@@ -19,13 +19,15 @@ public class SensorReadingRepository : ISensorReadingRepository
 
     public async Task<SensorReading> AddSensorReadingAsync(SensorReading sensorReading)
     {
+        if(sensorReading == null)
+            throw new ArgumentNullException(nameof(sensorReading), $"'{nameof(AddSensorReadingAsync)}': Sensor reading cannot be null");
         await  _context.SensorReadings.AddAsync(sensorReading);
         await _context.SaveChangesAsync();
 
         return sensorReading;
     }
 
-    public async Task<IEnumerable<SensorReading>> GetAllSensorReadingsForSensorAsync(int sensorId)
+    public async Task<List<SensorReading>> GetAllSensorReadingsForSensorAsync(int sensorId)
     {
         return await _context.SensorReadings.Where(a => a.SensorId == sensorId).ToListAsync();
     }
@@ -35,13 +37,13 @@ public class SensorReadingRepository : ISensorReadingRepository
         return await _context.SensorReadings.OrderByDescending(s => s.Created).Where(s => s.SensorId == sensorId).FirstOrDefaultAsync();
     }
 
-    public async Task<PaginatedData<List<SensorReading>>?> GetPaginatedSensorReadings(int sensorId, int pageNumber)
+    public async Task<PaginatedData<List<SensorReading>>> GetPaginatedSensorReadings(int sensorId, int pageNumber)
     {
         var sensor = await _context.Sensors.FindAsync(sensorId);
 
         if (sensor == null)
-            return null;
-
+            throw new KeyNotFoundException($"'{nameof(GetPaginatedSensorReadings)}': No sensor found with ID '{sensorId}'");
+        
         var readings = await _context.SensorReadings.Where(s => s.SensorId == sensorId).ToListAsync();
 
         var totalPages = (int)Math.Ceiling((double)readings.Count() / sensor.PageSize);
@@ -70,8 +72,16 @@ public class SensorReadingRepository : ISensorReadingRepository
         return result;
     }
 
+    public async Task DeleteAllSensorReadingsAsync()
+    {
+        var sensorReadings = await _context.SensorReadings.ToListAsync();
+        _context.SensorReadings.RemoveRange(sensorReadings);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<SensorReading?> GetSensorReadingByIdAsync(int sensorReadingId)
     {
         return await _context.SensorReadings.FindAsync(sensorReadingId);
     }
+
 }

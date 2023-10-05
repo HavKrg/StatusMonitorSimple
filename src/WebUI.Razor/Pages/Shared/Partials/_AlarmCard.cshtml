@@ -1,0 +1,27 @@
+@model Application.Dtos.AlarmResponse
+
+@{
+    var cardBgColor = string.Empty;
+    if(Model.Status)
+        cardBgColor = "#d4edda";
+    else
+        cardBgColor = "#f8d7da";
+}
+
+<div class="card" style="background-color:@cardBgColor; width: 20rem; margin: 10px; padding: 1px; display: flex; justify-content: center; align-items: center; height: 5rem;">
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <p class="card-title">@Model.Description - @(@Model.Status ? "ok" : "alarm")</p>
+        <p class="card-text">@Model.Updated</p>
+    </div>
+</div>
+
+@* <div class="card" style="--card-bg-color: @(@Model.Status ? "#d4edda" : "#f8d7da"); width: 20rem; margin: 10px;
+padding: 1px; background-color: var(--card-bg-color);">
+<div class="card-body text-center">
+<div class="d-flex flex-column align-items-center justify-content-center">
+<p class="card-title p-3">@Model.Description</p>
+<p class="card-text">@Model.Status</p>
+<p class="card-text">@Model.Updated</p>
+</div>
+</div>
+</div> *@

@@ -18,6 +18,8 @@
   <ItemGroup>
     <Folder Include="app\" />
     <Folder Include="app\database\" />
+    <Folder Include="Pages\Sensors\Settings\" />
+    <Folder Include="Pages\Shared\Partials\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 

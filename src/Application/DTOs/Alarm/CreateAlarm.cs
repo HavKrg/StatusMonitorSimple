@@ -1,5 +1,3 @@
-using WebUI.Razor.Models;
-
 namespace Application.Dtos;
 
 public class CreateAlarm

@@ -45,7 +45,7 @@ public class IndexModel : PageModel
         {
             location.ModbusStatus = await _modbusStatusService.GetModbusStatusByLocationIdAsync(location.Id);
             location.Sensors = (List<SensorResponse>)await _sensorService.GetAllSensorsForLocationAsync(location.Id);
-            location.Alarms = (List<AlarmResponse>)await _alarmService.GetAllAlarmForLocationAsync(location.Id);
+            location.Alarms = (List<AlarmResponse>)await _alarmService.GetAllAlarmsForLocationAsync(location.Id);
         }
 
         var DbFileInfo = new FileInfo("SensorMonitor.db");

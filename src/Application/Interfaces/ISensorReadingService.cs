@@ -9,5 +9,6 @@ public interface ISensorReadingService
     Task<SensorReadingResponse?> GetLatestReadingForSensorAsync(int sensorId);
     Task<PaginatedDataResponse<List<SensorReadingResponse>>?> GetPaginatedSensorReadingsAsync(int sensorId, int pageNumber);
     Task<List<SensorReadingResponse?>> GetAllReadingsForSensorAsync(int sensorId);
+    Task DeleteAllSensorReadingsAsync();
 }
 

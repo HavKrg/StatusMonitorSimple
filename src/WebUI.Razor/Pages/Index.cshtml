@@ -17,52 +17,21 @@
         {
             @foreach (var location in @Model.Locations)
             {
-                <div class="container">
-                    <div class="container">
-                        <h1 class="display-4 row d-flex align-items-center justify-content-center groupname">
-                            <a class="text-decoration-none text-reset  row d-flex align-items-center justify-content-center"
-                                asp-area="" asp-page="/Index">@location.Name</a>
-                        </h1>
-                            <div class="container">
-                                <div class="row d-flex align-items-center justify-content-center">
-                                    <p>Result of last reading: @location.ModbusStatus.Success</p>
-                                    <p>Total readings: @location.ModbusStatus.AttemptedModbusReadings</p>
-                                    <p>Successfull readings: @location.ModbusStatus.SuccessfullModbusReadings</p>
-                                    <p>Failed readings: @location.ModbusStatus.FailedModbusReadings</p>
-                                    @if (@location.ModbusStatus.FailedModbusReadings != 0)
-                                    {
-                                        <p>Time of last failed modbusreading: @location.ModbusStatus.TimeOfLastFailedReading</p>
-                                        <p>Last error message: @location.ModbusStatus.ErrorMessage</p>
-                                    }
-                                </div>
-                            </div>
-                    </div>
-                    <div class="container">
-                        <div class="row d-flex align-items-center justify-content-center">
-                            @foreach (var sensor in location.Sensors)
-                            {
-                                await Html.RenderPartialAsync("_SensorCard", sensor);
-                            }
-                        </div>
-                        <div class="container">
-                            <div class="row d-flex align-items-center justify-content-center">
-                                @foreach (var alarm in location.Alarms)
-                                {
-                                    await Html.RenderPartialAsync("_AlarmCard", alarm);
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @await Html.PartialAsync("~/Pages/Shared/Partials/_Location.cshtml", location)
             }
-
-
         }
     </div>
 </div>
 
 
+
+
 <style>
+    .btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
     .groupname {
         margin-top: 50;
         min-height: 75px;
@@ -171,5 +140,17 @@
         position: absolute;
         bottom: 0;
         right: 5%;
+    }
+
+    a.card-link {
+        color: inherit;
+        /* Inherit the color from the parent element or make it whatever color you want */
+        text-decoration: none;
+    }
+
+    a.card-link:hover {
+        color: inherit;
+        /* Inherit the color from the parent on hover or make it whatever color you want */
+        text-decoration: none;
     }
 </style>
