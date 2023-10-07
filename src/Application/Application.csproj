@@ -11,4 +11,9 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="mqttnet" Version="4.3.1.873" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.0.858" />
+  </ItemGroup>
+
 </Project>

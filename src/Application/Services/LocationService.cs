@@ -19,7 +19,8 @@ public class LocationService : ILocationService
 
     public async Task<LocationResponse> AddLocationAsync(CreateLocation createLocation)
     {
-        return await _locationRepository.AddLocationAsync((Domain.Models.Location)createLocation);
+        var location = await _locationRepository.AddLocationAsync((Domain.Models.Location)createLocation);
+        return location;
     }
 
     public async Task DeleteLocationAsync(int locationId)

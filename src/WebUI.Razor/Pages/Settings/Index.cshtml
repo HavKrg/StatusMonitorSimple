@@ -3,9 +3,12 @@
 @{
 }
 
-<form method="post" onsubmit="return confirm('Are you sure you want to delete all sensor readings?');">
-    <input type="submit" value="Delete All Readings" asp-page-handler="DeleteAllSensorReadings" />
-</form>
+<div class="container w-100" style="margin-top: 20rem;">
+    <form method="post" onsubmit="return confirm('Are you sure you want to delete all sensor readings?');" class="d-flex align-items-center justify-content-center">
+        <input type="submit" value="Delete All Readings" asp-page-handler="DeleteAllSensorReadings" class="btn btn-danger btn-lg w-50" />
+    </form>
+</div>  
 
-
-<p>Size of database: @Model.DbSize kB</p>
+<div class="container w-100 d-flex align-items-center justify-content-center">
+    <p>Size of database: @Model.DbSize kB</p>
+</div>

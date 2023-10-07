@@ -23,7 +23,7 @@ namespace WebUI.Razor.Pages.Sensors
             _sensorReadingService = sensorReadingService;
         }
 
-        public SensorResponse Sensor { get; set; }
+        public SensorResponse? Sensor { get; set; }
         public PaginatedDataResponse<List<SensorReadingResponse>>? Readings { get; set; }
         public async Task OnGetAsync(int sensorId, int pageNumber = 0)
         {

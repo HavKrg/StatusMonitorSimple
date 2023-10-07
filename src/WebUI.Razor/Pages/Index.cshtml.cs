@@ -3,11 +3,10 @@ using Application;
 using Application.Dtos;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Application.Models;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using WebUI.Razor.Models;
 
 namespace WebUI.Razor.Pages;
 

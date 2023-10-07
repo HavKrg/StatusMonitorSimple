@@ -3,20 +3,17 @@ using Application;
 using Application.Dtos;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Application.Models;
 using Application.Services;
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.SeedData;
-using WebUI.Razor;
-using WebUI.Razor.Models;
-using WebUI.Razor.Workers.MqttBridge;
 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
 
 // Parse configurartion files from argument
 if (args.Length == 0)
@@ -66,12 +63,14 @@ builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddScoped<IAlarmService, AlarmService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IModbusStatusService, ModbusStatusService>();
-builder.Services.AddHostedService<MqttBridge>();
+builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
+// builder.Services.AddHostedService<MqttBridge>();
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
