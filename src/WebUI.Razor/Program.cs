@@ -5,13 +5,19 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.Models;
 using Application.Services;
+using Auth0.AspNetCore.Authentication;
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.SeedData;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using WebUI.Razor.Workers.MqttBridge;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -50,43 +56,73 @@ else
 
 
 // Add services to the container.
+// builder.Services.AddRazorPages(options =>
+// {
+//     options.Conventions.AuthorizeFolder("/Alarm");
+//     options.Conventions.AuthorizeFolder("/Settings");
+//     options.Conventions.AuthorizePage("/Account/Logout");
+// });
+
+// if (projectSettings.Auth0ClientId != string.Empty
+//     && projectSettings.Auth0Domain != string.Empty)
+// {
+//     builder.Services
+// .AddAuth0WebAppAuthentication(options =>
+// {
+//     options.Domain = projectSettings.Auth0Domain;
+//     options.ClientId = projectSettings.Auth0ClientId;
+// });
+// }
+
 builder.Services.AddRazorPages();
+
+
+// Add DbContext
 builder.Services.AddDbContext<StatusMonitorDbContext>();
+
+// Add Repositories
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IAlarmRepository, AlarmRepository>();
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
 builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
 builder.Services.AddScoped<IModbusStatusRepository, ModbusStatusRepository>();
 
+// Add Services
 builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
 builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddScoped<IAlarmService, AlarmService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IModbusStatusService, ModbusStatusService>();
 builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
-// builder.Services.AddHostedService<MqttBridge>();
-
+builder.Services.AddHostedService<MqttBridge>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-    System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
-
     var locationsJson = System.Text.Json.JsonSerializer.Serialize(locations);
     SeedDataProd.Initialize(locationsJson, args.Length > 1 ? args[1] : null);
 }
-if (app.Environment.IsDevelopment())
+
+if (app.Environment.IsProduction())
 {
-    System.Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
-    // var sensorJson = System.Text.Json.JsonSerializer.Serialize(sensors);
-    // SeedDataProd.Initialize(sensorJson, args.Length > 1 ? args[1] : null);
+    app.UseExceptionHandler("/Error");
+    app.UseHttpsRedirection();
+    app.UseHsts();
 }
+
+var fordwardedHeaderOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+fordwardedHeaderOptions.KnownNetworks.Clear();
+fordwardedHeaderOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(fordwardedHeaderOptions);
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

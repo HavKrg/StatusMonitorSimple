@@ -34,9 +34,10 @@ public class MqttClientService : IMqttClientService
         {
             { "/sensor/", HandleSensorReading },
             { "/alarm/", HandleAlarmReading },
-            { "/modbus", HandleModbusStatus }
+            { "/modbus", HandleModbusStatus },
+            { "/hv/", HandleSensorReading },
         };
-        InitializeAsync().GetAwaiter().GetResult();
+        // InitializeAsync().GetAwaiter().GetResult();
     }
 
     public async Task InitializeAsync()
@@ -167,12 +168,15 @@ public class MqttClientService : IMqttClientService
             if (alarm == null)
                 throw new NullReferenceException($"no alarm found  for topic '{topic}'");
 
-            if (!TryParseOneZeroToBool(message, out bool status))
+            if (!TryParseToBool(message, out bool status))
             {
                 _logger.LogError($"Problem : Message is not parsable to a bool");
             }
 
-            await alarmService.SetAlarmStatusAsync(alarm.Id, status);
+            if(!alarm.Inverted)
+                await alarmService.SetAlarmStatusAsync(alarm.Id, status);
+            else
+                await alarmService.SetAlarmStatusAsync(alarm.Id, !status);
         }
     }
 
@@ -209,7 +213,7 @@ public class MqttClientService : IMqttClientService
             // check if the value is inside the expected range
             if (value > sensor.MaxReading || value < sensor.MinReading)
             {
-                _logger.LogError($"Problem : Message is parsable to a double, but it's not within the sensors min/max value range");
+                _logger.LogError($"{sensor.Name} - {sensor.MqttTopic} - Problem : Message is parsable to a double, but it's not within the sensors min/max value range");
             }
 
             var newSensorReading = await sensorReadingService.AddReadingAsync(new CreateSensorReading { SensorId = sensor!.Id, Value = value, IsValid = true });
@@ -251,8 +255,11 @@ public class MqttClientService : IMqttClientService
     {
         foreach (var location in _locations)
         {
-            await _mqttClient.SubscribeAsync(location.ModbusMqttTopic);
-            _logger.LogInformation($"Subscribed to {location.ModbusMqttTopic}");
+            if(location.ModbusMqttTopic != string.Empty)
+            {
+                await _mqttClient.SubscribeAsync(location.ModbusMqttTopic);
+                _logger.LogInformation($"Subscribed to {location.ModbusMqttTopic}");
+            }
         }
     }
     private async Task ConnectionChanged(EventArgs args)
@@ -269,20 +276,23 @@ public class MqttClientService : IMqttClientService
         _logger.LogCritical($"Failed to connect to broker\n '{args.Exception.Message}'\n '{args.ConnectResult.UserProperties}'\n'{args.ConnectResult.ResultCode}'");
     }
     private static string FormattedDateTime => $"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToLongTimeString()}";
-    public static bool TryParseOneZeroToBool(string str, out bool result)
+    public static bool TryParseToBool(string str, out bool result) 
+{
+    if (str == "1" || str.ToLower() == "true") 
     {
-        if (str == "1")
-        {
-            result = true;
-            return true;
-        }
-        else if (str == "0")
-        {
-            result = false;
-            return true;
-        }
-
+        result = true;
+        return true;
+    } 
+    else if (str == "0" || str.ToLower() == "false") 
+    {
+        result = false;
+        return true;
+    } 
+    else 
+    {
         result = false;
         return false;
     }
+}
+
 }

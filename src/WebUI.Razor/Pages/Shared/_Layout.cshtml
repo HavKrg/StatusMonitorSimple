@@ -9,8 +9,19 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
-
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+    @if (User.Identity.IsAuthenticated)
+    {
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-dark display-6" asp-area="" 
+             asp-page="/Account/Logout">Logout</a>
+         </li>
+       </ul>
+    }
+  </div>
 </head>
+
 <body>
     <partial name="_Header" />
     <div class="container">

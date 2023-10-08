@@ -7,9 +7,15 @@ public class Alarm : BaseEntity
     public string Description { get; set; }
     public string MqttTopic { get; set; }
     public int SecondsBeforeOldReading { get; set; }
-    public bool Status { get; set; }
+    public bool? Status { get; set; } = null;
+    public bool Inverted { get; set; }
 
-    public Alarm(int id, int locationId, string name, string description, string mqttTopic, int secondsBeforeOldReading, bool status)
+    public Alarm()
+    {
+        
+    }
+
+    public Alarm(int id, int locationId, string name, string description, string mqttTopic, int secondsBeforeOldReading, bool? status, bool inverted)
     {
         Id = id;
         LocationId = locationId;
@@ -17,7 +23,8 @@ public class Alarm : BaseEntity
         Description = description;
         MqttTopic = mqttTopic;
         SecondsBeforeOldReading = secondsBeforeOldReading;
-        Status = status;
+        Status = null;
+        Inverted = inverted;
     }
     public void Update(Alarm alarm)
     {
@@ -26,7 +33,8 @@ public class Alarm : BaseEntity
         Description = alarm.Description;
         MqttTopic = alarm.MqttTopic;
         SecondsBeforeOldReading = alarm.SecondsBeforeOldReading;
-        Status = alarm.Status;
+        Status = null;
+        Inverted = alarm.Inverted;
         Updated = DateTime.Now;
     }
 }

@@ -1,16 +1,25 @@
 @model Application.Dtos.AlarmResponse
 
 @{
-    var cardBgColor = string.Empty;
-    if(Model.Status)
+    var cardBgColor = "#ffc107";
+    var alarmStatusText = "Ingen data foreløbig";
+    if (Model.Status.HasValue && !Model.Status.GetValueOrDefault())
+    {
         cardBgColor = "#d4edda";
-    else
+        alarmStatusText = "OK";
+    }
+    else if (Model.Status.HasValue && Model.Status.GetValueOrDefault())
+    {
         cardBgColor = "#f8d7da";
+        alarmStatusText = "ALARM";
+    }
+
 }
 
-<div class="card" style="background-color:@cardBgColor; width: 20rem; margin: 10px; padding: 1px; display: flex; justify-content: center; align-items: center; height: 5rem;">
+<div class="card"
+    style="background-color:@cardBgColor; width: 20rem; margin: 10px; padding: 1px; display: flex; justify-content: center; align-items: center; height: 5rem;">
     <div class="d-flex flex-column align-items-center justify-content-center">
-        <p class="card-title">@Model.Description - @(@Model.Status ? "ok" : "alarm")</p>
+        <p class="card-title">@Model.Description - @alarmStatusText</p>
         <p class="card-text">@Model.Updated</p>
     </div>
 </div>

@@ -8,7 +8,8 @@ public class AlarmResponse
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
     public required int SecondsBeforeOldReading { get; set; }
-    public bool Status { get; set; }
+    public bool? Status { get; set; } = null;
+    public bool Inverted { get; set; }
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
 
@@ -27,7 +28,8 @@ public class AlarmResponse
             SecondsBeforeOldReading = alarm.SecondsBeforeOldReading,
             Status = alarm.Status,
             Created = alarm.Created,
-            Updated = alarm.Updated
+            Updated = alarm.Updated,
+            Inverted = alarm.Inverted
         };
     }
 }

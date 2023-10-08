@@ -13,6 +13,13 @@ public class StatusMonitorDbContext : DbContext
     {
         optionsBuilder.UseSqlite("Data source = SensorMonitor.db");
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Alarm>().Property(a => a.Status).HasDefaultValue(null);
+
+        base.OnModelCreating(modelBuilder);
+    }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Sensor> Sensors { get; set; }
     public DbSet<Alarm> Alarms { get; set; }

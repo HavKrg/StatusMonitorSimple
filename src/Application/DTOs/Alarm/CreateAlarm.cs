@@ -8,7 +8,8 @@ public class CreateAlarm
     public required string Description { get; set; }
     public required string MqttTopic { get; set; }
     public required int SecondsBeforeOldReading { get; set; }
-    public bool Status { get; set; }
+    public bool? Status { get; set; } = null;
+    public bool Inverted { get; set; }
 
     public static explicit operator Alarm(CreateAlarm createAlarm)
     {
@@ -19,6 +20,7 @@ public class CreateAlarm
             createAlarm.Description, 
             createAlarm.MqttTopic, 
             createAlarm.SecondsBeforeOldReading,
-            createAlarm.Status);
+            createAlarm.Status,
+            createAlarm.Inverted);
     }
 }

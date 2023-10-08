@@ -12,14 +12,7 @@ public static class SeedDataProd
 {
     public static async void Initialize(string locationsJson, string? requestMessage)
     {
-        var locations = JsonSerializer.Deserialize<List<Location>>(locationsJson);
-        if (locations == null || locations.Count == 0)
-        {
-            System.Console.WriteLine("No location data provided");
-            return;
-        }
-
-        if(string.IsNullOrWhiteSpace(requestMessage))
+        if (string.IsNullOrWhiteSpace(requestMessage))
             requestMessage = "no request message";
         Console.WriteLine(requestMessage);
         var optionsBuilder = new DbContextOptionsBuilder<StatusMonitorDbContext>();
@@ -33,22 +26,33 @@ public static class SeedDataProd
                 System.Console.WriteLine("creating database");
                 await context.Database.EnsureCreatedAsync();
                 System.Console.WriteLine("ensure created complete");
+                context.RemoveRange(await context.Alarms.ToListAsync());
+                context.RemoveRange(await context.Sensors.ToListAsync());
+                context.RemoveRange(await context.SensorReadings.ToListAsync());
             }
             else if (requestMessage == "clear readings")
             {
                 await context.Database.EnsureCreatedAsync();
-                
+
                 System.Console.WriteLine("deleting readings");
-                context.SensorReadings.RemoveRange(context.SensorReadings);
+                context.RemoveRange(await context.SensorReadings.ToListAsync());
             }
             else
             {
                 System.Console.WriteLine("creating database");
                 await context.Database.EnsureCreatedAsync();
             }
-            
+
 
             await context.SaveChangesAsync();
+
+
+            var locations = JsonSerializer.Deserialize<List<Location>>(locationsJson);
+            if (locations == null || locations.Count == 0)
+            {
+                System.Console.WriteLine("No location data provided");
+                return;
+            }
 
 
             foreach (var location in locations)
@@ -66,39 +70,7 @@ public static class SeedDataProd
                     System.Console.WriteLine($"updating location: {location.Name}");
                     dBLocation.Update(location);
                 }
-
-                foreach (var sensor in location.Sensors)
-                {
-                    sensor.LocationId = location.Id;
-                    var dbSensor = await context.Sensors.FindAsync(sensor.Id);
-                    if(dbSensor == null)
-                    {
-                        System.Console.WriteLine($"adding sensor: {sensor.Name}");
-                        await context.Sensors.AddAsync(sensor);
-                    }
-                    else
-                    {
-                        System.Console.WriteLine($"updating location: {sensor.Name}");
-                        dbSensor.Update(sensor);
-                    }
-                }
-                foreach (var alarm in location.Alarms)
-                {
-                    alarm.LocationId = location.Id;
-                    var dbAlarm = await context.Alarms.FindAsync(alarm.Id);
-                    if(dbAlarm == null)
-                    {
-                        System.Console.WriteLine($"adding sensor: {alarm.Name}");
-                        await context.Alarms.AddAsync(alarm);
-                    }
-                    else
-                    {
-                        System.Console.WriteLine($"updating location: {alarm.Name}");
-                        dbAlarm.Update(alarm);
-                    }
-                }
             }
-
             await context.SaveChangesAsync();
         }
 
